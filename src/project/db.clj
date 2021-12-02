@@ -1,6 +1,8 @@
 (ns project.db
   (:require [monger.core :as mg]
-            [monger.collection :as mc]))
+            [monger.collection :as mc])
+  (:import
+    [org.bson.types ObjectId]))
 
 (def db-connection-uri (or (System/getenv "PROJECT_MONGO_URI")
                            "mongodb://127.0.0.1/project"))
@@ -19,3 +21,6 @@
 
 (defn get-producers []
   (mc/find-maps db producers-collection))
+
+(defn get-producer-by-id [producer-id]
+  (mc/find-map-by-id db producers-collection (ObjectId. producer-id)))
