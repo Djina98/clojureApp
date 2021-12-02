@@ -1,6 +1,8 @@
 <component name="libraryTable">
   <library name="Leiningen: ring/ring-mock:0.3.2">
-    <CLASSES />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/ring/ring-mock/0.3.2/ring-mock-0.3.2.jar!/" />
+    </CLASSES>
     <JAVADOC />
     <SOURCES />
   </library>
