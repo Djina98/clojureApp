@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  mongo:
+    image: mongo
+    networks:
+      - project-nw
+    volumes:
+      - db-data:/data/db
+  project:
+    image: project
+    ports:
+      - 80:8888
+    networks:
+      - project-nw
+    environment:
+      PROJECT_PORT: 8888
+      PROJECT_MONGO_URI: mongodb://mongo/project
+      PROJECT_ADMIN_USERNAME: admin
+      PROJECT_ADMIN_PASSWORD: admin
+
+networks:
+  project-nw:
+    driver: bridge
+
+volumes:
+  db-data:
