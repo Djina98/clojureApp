@@ -41,7 +41,11 @@
 
            (POST "/producers/:producer-id" [producer-id name address contact description]
              (do (db/update-producer producer-id name address contact description)
-                 (response/redirect (str "/producers/" producer-id)))))
+                 (response/redirect (str "/producers/" producer-id))))
+
+           (DELETE "/producers/:producer-id" [producer-id]
+             (do (db/delete-producer producer-id)
+                 (response/redirect "/"))))
 
 (defn wrap-admin-only [handler]
   (fn [request]

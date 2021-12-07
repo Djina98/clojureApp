@@ -1,6 +1,7 @@
 (ns project.pages
   (:require [hiccup.page :refer [html5]]
             [hiccup.form :as form]
+            [markdown.core :as markdown]
             [ring.util.anti-forgery :refer [anti-forgery-field]]))
 
 (defn template [& body]
@@ -33,17 +34,21 @@
     (for [p producers]
       [:div
        [:h2 [:a {:href (str "/producers/" (:_id p))} (:name p)]]
-       [:p (-> p :description cut-description)]
+       [:p (-> p :description cut-description markdown/md-to-html-string)]
        ]
       )))
 
 (defn producer [p]
   (template
-    [:a {:href (str "/producers/" (:_id p) "/edit")} "Izmeni"]
+    (form/form-to
+      [:delete (str "/producers/" (:_id p))]
+      (anti-forgery-field)
+      [:a.btn.btn-primary {:href (str "/producers/" (:_id p) "/edit")} "Izmeni"]
+      (form/submit-button {:class "btn btn-danger"} "Obriši"))
     [:hr]
     [:small (:address p)]
     [:h1 (:name p)]
-    [:p (:description p)]
+    [:p (-> p :description markdown/md-to-html-string)]
     [:small (:contact p)]))
 
 (defn edit-producer [p]
@@ -52,21 +57,26 @@
       [:post (if p
                (str "/producers/" (:_id p))
                "/producers")]
-      (form/label "name" "Naziv proizvođača")
-      (form/text-field "name" (:name p))
+      [:div.form-group
+       (form/label "name" "Naziv proizvođača")
+       (form/text-field {:class "form-control"} "name" (:name p))]
 
-      (form/label "description" "Kratak opis")
-      (form/text-area "description" (:description p))
+      [:div.form-group
+       (form/label "description" "Kratak opis")
+       (form/text-area {:class "form-control"} "description" (:description p))]
 
-      (form/label "address" "Adresa")
-      (form/text-field "address" (:address p))
+      [:div.form-group
+       (form/label "address" "Adresa")
+       (form/text-field {:class "form-control"} "address" (:address p))]
 
-      (form/label "contact" "Kontakt")
-      (form/text-field "contact" (:contact p))
+      [:div.form-group
+       (form/label "contact" "Kontakt")
+       (form/text-field {:class "form-control"} "contact" (:contact p))
+       [:br]]
 
       (anti-forgery-field)
 
-      (form/submit-button "Sačuvaj izmene"))))
+      (form/submit-button {:class "btn btn-primary"} "Sačuvaj izmene"))))
 
 (defn admin-login [& [message]]
   (template

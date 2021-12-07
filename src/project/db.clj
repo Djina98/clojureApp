@@ -28,6 +28,9 @@
                 :contact contact
                 :description description}}))
 
+(defn delete-producer [producer-id]
+  (mc/remove-by-id db producers-collection (ObjectId. producer-id)))
+
 (defn get-producers []
   (mc/find-maps db producers-collection))
 
