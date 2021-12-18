@@ -31,12 +31,17 @@
 
 (defn index [producers]
   (template
+    [:br]
+    [:div {:class "row"}
     (for [p producers]
-      [:div
-       [:h2 [:a {:href (str "/producers/" (:_id p))} (:name p)]]
-       [:p (-> p :description cut-description markdown/md-to-html-string)]
-       ]
-      )))
+      [:div {:class "col-sm-4"}
+      [:div {:class "card border-dark"}
+       [:div {:class "card-body"}
+        [:h5 {:class "card-text"} [:a {:href (str "/producers/" (:_id p))} (:name p)]]
+        [:p {:class "card-text"} (-> p :description cut-description markdown/md-to-html-string)]
+        ]]]
+      )]
+    ))
 
 (defn producer [p]
   (template
@@ -48,6 +53,7 @@
     [:hr]
     [:small (:address p)]
     [:h1 (:name p)]
+    [:small (:certified p)]
     [:p (-> p :description markdown/md-to-html-string)]
     [:small (:contact p)]))
 
@@ -71,7 +77,11 @@
 
       [:div.form-group
        (form/label "contact" "Kontakt")
-       (form/text-field {:class "form-control"} "contact" (:contact p))
+       (form/text-field {:class "form-control"} "contact" (:contact p))]
+
+      [:div.form-group
+       (form/label "certified" "Organski sertifikat?")
+       (form/text-field {:class "form-control"} "certified" (:certified p))
        [:br]]
 
       (anti-forgery-field)

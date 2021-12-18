@@ -33,14 +33,14 @@
 (defroutes admin-routes
            (GET "/producers/new" [] (pages/edit-producer nil))
 
-           (POST "/producers" [name address contact description]
-             (do (db/create-producer name address contact description)
+           (POST "/producers" [name address contact description certified]
+             (do (db/create-producer name address contact description certified)
                  (response/redirect "/")))
 
            (GET "/producers/:producer-id/edit" [producer-id] (pages/edit-producer (db/get-producer-by-id producer-id)))
 
-           (POST "/producers/:producer-id" [producer-id name address contact description]
-             (do (db/update-producer producer-id name address contact description)
+           (POST "/producers/:producer-id" [producer-id name address contact description certified]
+             (do (db/update-producer producer-id name address contact description certified)
                  (response/redirect (str "/producers/" producer-id))))
 
            (DELETE "/producers/:producer-id" [producer-id]
