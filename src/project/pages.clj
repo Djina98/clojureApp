@@ -14,15 +14,19 @@
              :integrity "sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
              :crossorigin "anonymous"}]]
     [:body
-     [:div.container
-      [:nav.navbar.navbar-expand-lg.navbar-light.bd-light
-       [:a.navbar-brand {:href "/"} "Bee organic"]
-       [:div.navbar-nav.ml-auto
-        [:a.nav-item.nav-link {:href "/producers/new"} "Dodaj novog proizvođača"]
-        [:a.nav-item.nav-link {:href "/admin/login"} "Uloguj se"]
-        [:a.nav-item.nav-link {:href "/admin/logout"} "Odjavi se"]
-        ]]
-      body]]))
+      ;[:nav.navbar.navbar-expand-lg.navbar-light.bg-light
+      [:nav.navbar.navbar-expand-sm.bg-success.navbar-dark
+       [:div.container-fluid
+        [:ul.navbar-nav
+         [:li.nav-item
+          [:a.navbar-brand {:href "/" :style "font-weight:bold"} "Bee organic"]]
+         [:li.nav-item
+          [:a.nav-link {:href "/producers/new"} "Dodaj novog proizvođača"]]
+         [:li.nav-item
+          [:a.nav-link {:href "/admin/login"} "Uloguj se"]]
+         [:li.nav-item
+          [:a.nav-link {:href "/admin/logout"} "Odjavi se"]]]]]
+     [:div.container {:style "margin-top:30px"} body]]))
 
 (def preview-length 270)
 
@@ -35,14 +39,15 @@
 ;Page with all producers, 3 producers per row
 (defn index [producers]
   (template
-    [:br]
-    [:br]
-    [:div {:class "row"}
+    [:div {:class "row" :style "padding:15px"}
     (for [p producers]
       [:div {:class "col-sm-4"}
-      [:div {:class "card"}
+      [:div {:class "card" :style "margin-bottom:30px"}
        [:div {:class "card-body"}
-        [:h5 {:class "card-text"} [:a {:href (str "/producers/" (:_id p))} (:name p)]]
+        ;[:h5 {:class "card-text"} [:a {:href (str "/producers/" (:_id p))} (:name p)]]
+        [:div {:class "row"}
+         [:div {:class "col text-center"}
+          [:a.btn.btn-outline-success {:href (str "/producers/" (:_id p)) :style "font-weight:bold"} (:name p)]]]
         [:p {:class "card-text"} (-> p :description cut-description markdown/md-to-html-string)]
         ]]]
       )]
@@ -52,23 +57,25 @@
 ;Producer page
 (defn producer [p]
   (template
+    [:small ((into {} (db/get-certified-by-value (:certified_id p))) :name)]
+    [:hr]
+    [:h1 (:name p)]
+    [:small (:address p)]
     [:br]
+    [:small (:contact p)]
+    [:p (-> p :description markdown/md-to-html-string)]
+    [:hr]
     (form/form-to
       [:delete (str "/producers/" (:_id p))]
       (anti-forgery-field)
-      [:a.btn.btn-primary {:href (str "/producers/" (:_id p) "/edit")} "Izmeni"]
+      [:a.btn.btn-secondary {:href (str "/") :style "margin-right:15px"} "Nazad"]
+      [:a.btn.btn-primary {:href (str "/producers/" (:_id p) "/edit") :style "margin-right:15px"} "Izmeni"]
       (form/submit-button {:class "btn btn-danger"} "Obriši"))
-    [:hr]
-    [:small (:address p)]
-    [:h1 (:name p)]
-    [:small ((into {} (db/get-certified-by-value (:certified_id p))) :name)]
-    [:p (-> p :description markdown/md-to-html-string)]
-    [:small (:contact p)]))
+    ))
 
 ;Edit producer and Add new producer page
 (defn edit-producer [p]
   (template
-    [:br]
     (form/form-to
       [:post (if p
                (str "/producers/" (:_id p))
@@ -110,16 +117,20 @@
     (form/form-to
       [:post "/admin/login"]
 
-      [:div.form-group
-       (form/label "username" "Email adresa")
-       (form/text-field  {:class "form-control"} "username")]
+      [:div {:class "row" :style "margin-top:100px"}
+       [:div {:class "col-md-4 offset-md-4"}
+        [:div.form-group
+         (form/label "username" "Email adresa")
+         (form/text-field  {:class "form-control"} "username")]
 
-      [:div.form-group
-       (form/label "password" "Lozinka")
-       (form/password-field {:class "form-control"} "password")
-       [:br]]
+        [:div.form-group
+         (form/label "password" "Lozinka")
+         (form/password-field {:class "form-control"} "password")
+         [:br]]]]
 
-      (anti-forgery-field)
-      (form/submit-button {:class "btn btn-primary"} "Uloguj se"))))
+      [:div {:class "row"}
+       [:div {:class "col text-center"}
+        (anti-forgery-field)
+        (form/submit-button {:class "btn btn-primary"} "Uloguj se")]])))
 
 
