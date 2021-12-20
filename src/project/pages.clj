@@ -2,8 +2,10 @@
   (:require [hiccup.page :refer [html5]]
             [hiccup.form :as form]
             [markdown.core :as markdown]
+            [project.db :as db]
             [ring.util.anti-forgery :refer [anti-forgery-field]]))
 
+;Header and navbar
 (defn template [& body]
   (html5
     [:head [:title "Bee organic"]
@@ -24,27 +26,33 @@
 
 (def preview-length 270)
 
+;Private function to display description on home page with maximum of 270 characters
 (defn- cut-description [description]
   (if (> (.length description) preview-length)
     (str (subs description 0 preview-length) "...")
     description))
 
+;Page with all producers, 3 producers per row
 (defn index [producers]
   (template
+    [:br]
     [:br]
     [:div {:class "row"}
     (for [p producers]
       [:div {:class "col-sm-4"}
-      [:div {:class "card border-dark"}
+      [:div {:class "card"}
        [:div {:class "card-body"}
         [:h5 {:class "card-text"} [:a {:href (str "/producers/" (:_id p))} (:name p)]]
         [:p {:class "card-text"} (-> p :description cut-description markdown/md-to-html-string)]
         ]]]
       )]
+    [:br]
     ))
 
+;Producer page
 (defn producer [p]
   (template
+    [:br]
     (form/form-to
       [:delete (str "/producers/" (:_id p))]
       (anti-forgery-field)
@@ -53,41 +61,48 @@
     [:hr]
     [:small (:address p)]
     [:h1 (:name p)]
-    [:small (:certified p)]
+    [:small ((into {} (db/get-certified-by-value (:certified_id p))) :name)]
     [:p (-> p :description markdown/md-to-html-string)]
     [:small (:contact p)]))
 
+;Edit producer and Add new producer page
 (defn edit-producer [p]
   (template
+    [:br]
     (form/form-to
       [:post (if p
                (str "/producers/" (:_id p))
-               "/producers")]
+               "/producers")
+       [:br]]
       [:div.form-group
        (form/label "name" "Naziv proizvođača")
-       (form/text-field {:class "form-control"} "name" (:name p))]
+       (form/text-field {:class "form-control"} "name" (:name p))
+       [:br]]
 
       [:div.form-group
        (form/label "description" "Kratak opis")
-       (form/text-area {:class "form-control"} "description" (:description p))]
+       (form/text-area {:class "form-control"} "description" (:description p))
+       [:br]]
 
       [:div.form-group
        (form/label "address" "Adresa")
-       (form/text-field {:class "form-control"} "address" (:address p))]
+       (form/text-field {:class "form-control"} "address" (:address p))
+       [:br]]
 
       [:div.form-group
        (form/label "contact" "Kontakt")
-       (form/text-field {:class "form-control"} "contact" (:contact p))]
+       (form/text-field {:class "form-control"} "contact" (:contact p))
+       [:br]]
 
       [:div.form-group
-       (form/label "certified" "Organski sertifikat?")
-       (form/text-field {:class "form-control"} "certified" (:certified p))
+       (form/drop-down {:class "form-control"} "certified_id" [["Sertifikovan organski" 1]["U periodu konverzije" 2] ["Nema sertifikat" 3]]  (:certified_id p))
        [:br]]
 
       (anti-forgery-field)
 
       (form/submit-button {:class "btn btn-primary"} "Sačuvaj izmene"))))
 
+;Admin login page
 (defn admin-login [& [message]]
   (template
     (when message
@@ -106,3 +121,5 @@
 
       (anti-forgery-field)
       (form/submit-button {:class "btn btn-primary"} "Uloguj se"))))
+
+
