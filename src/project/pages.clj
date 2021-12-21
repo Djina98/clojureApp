@@ -10,22 +10,40 @@
   (html5
     [:head [:title "Bee organic"]
      [:link {:rel "stylesheet"
+             :href "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"}]
+     [:link {:rel "stylesheet"
              :href "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
              :integrity "sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-             :crossorigin "anonymous"}]]
+             :crossorigin "anonymous"}]
+     [:link {:rel "stylesheet"
+             :href "/style.css"}]
+     ]
     [:body
-      ;[:nav.navbar.navbar-expand-lg.navbar-light.bg-light
-      [:nav.navbar.navbar-expand-sm.bg-success.navbar-dark
-       [:div.container-fluid
+     [:nav.navbar.navbar-expand-sm.bg-success.navbar-dark
+     [:div.container-fluid
+      [:ul.navbar-nav
+       [:li.nav-item
+        [:a.navbar-brand {:href "/" :style "font-weight:bold;font-size:20px"} "Bee organic"]]
+       [:li.nav-item
+        [:div.dropdown
+         [:button.dropbtn "Proizvođači\n      " [:i.fa.fa-caret-down]]
+         [:div.dropdown-content
+          [:a {:href "/producers/new"} "Dodaj novog"]
+          [:a {:href "/"} "Pregled"]
+          ]]]
+       [:li.nav-item
+        [:div.dropdown
+         [:button.dropbtn "Proizvodi\n      " [:i.fa.fa-caret-down]]
+         [:div.dropdown-content
+          [:a {:href "/products/new"} "Dodaj novi"]
+          [:a {:href "/"} "Pregled"]
+          ]]]]
+       [:div.d-flex.align-items-center
         [:ul.navbar-nav
          [:li.nav-item
-          [:a.navbar-brand {:href "/" :style "font-weight:bold"} "Bee organic"]]
+          [:a {:href "/admin/login"} "Uloguj se"]]
          [:li.nav-item
-          [:a.nav-link {:href "/producers/new"} "Dodaj novog proizvođača"]]
-         [:li.nav-item
-          [:a.nav-link {:href "/admin/login"} "Uloguj se"]]
-         [:li.nav-item
-          [:a.nav-link {:href "/admin/logout"} "Odjavi se"]]]]]
+          [:a {:href "/admin/logout"} "Odjavi se"]]]]]]
      [:div.container {:style "margin-top:30px"} body]]))
 
 (def preview-length 270)
