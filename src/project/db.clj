@@ -13,6 +13,7 @@
 
 (def producers-collection "producers")
 (def certified-collection "certified")
+(def products-collection "products")
 
 (defn create-producer [name address contact description certified_id]
   (mc/insert db producers-collection
@@ -40,9 +41,36 @@
 (defn get-producer-by-id [producer-id]
   (mc/find-map-by-id db producers-collection (ObjectId. producer-id)))
 
-(defn get-certified-by-id [certified-id]
-  (mc/find-map-by-id db certified-collection (ObjectId. certified-id)))
-
 (defn get-certified-by-value [value]
   (mc/find-maps db certified-collection  {:value value}))
+
+(defn create-product [name description amount price packaging type producer_id]
+  (mc/insert db products-collection
+             {:name name
+              :description description
+              :amount amount
+              :price price
+              :packaging packaging
+              :type type
+              :producer_id producer_id}))
+
+(defn update-product [product-id name description amount price packaging type producer_id]
+  (mc/update-by-id db products-collection (ObjectId. product-id)
+                   {$set
+                    {:name name
+                     :description description
+                     :amount amount
+                     :price price
+                     :packaging packaging
+                     :type type
+                     :producer_id producer_id}}))
+
+(defn delete-product [product-id]
+  (mc/remove-by-id db products-collection (ObjectId. product-id)))
+
+(defn get-products []
+  (mc/find-maps db products-collection))
+
+(defn get-product-by-id [product-id]
+  (mc/find-map-by-id db products-collection (ObjectId. product-id)))
 

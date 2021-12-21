@@ -36,7 +36,7 @@
          [:button.dropbtn "Proizvodi\n      " [:i.fa.fa-caret-down]]
          [:div.dropdown-content
           [:a {:href "/products/new"} "Dodaj novi"]
-          [:a {:href "/"} "Pregled"]
+          [:a {:href "/products"} "Pregled"]
           ]]]]
        [:div.d-flex.align-items-center
         [:ul.navbar-nav
@@ -91,7 +91,7 @@
       (form/submit-button {:class "btn btn-danger"} "Obriši"))
     ))
 
-;Edit producer and Add new producer page
+;Edit producer and Add new producer form
 (defn edit-producer [p]
   (template
     (form/form-to
@@ -121,6 +121,93 @@
 
       [:div.form-group
        (form/drop-down {:class "form-control"} "certified_id" [["Sertifikovan organski" 1]["U periodu konverzije" 2] ["Nema sertifikat" 3]]  (:certified_id p))
+       [:br]]
+
+      (anti-forgery-field)
+
+      (form/submit-button {:class "btn btn-primary"} "Sačuvaj izmene"))))
+
+;Page with all products, 3 products per row
+(defn products [products]
+  (template
+    [:div {:class "row" :style "padding:15px"}
+     (for [p products]
+       [:div {:class "col-sm-4"}
+        [:div {:class "card" :style "margin-bottom:30px"}
+         [:div {:class "card-body"}
+          [:div {:class "row"}
+           [:div {:class "col text-center"}
+            [:a.btn.btn-outline-success {:href (str "/products/" (:_id p)) :style "font-weight:bold"} (:name p)]]]
+          [:p {:class "card-text"} (-> p :description cut-description markdown/md-to-html-string)]
+          ]]]
+       )]
+    [:br]
+    ))
+
+;Product page
+(defn product [p]
+  (template
+    [:small (str "Proizvođač: " ((into {} (db/get-producer-by-id (:producer_id p))) :name))]
+    [:br]
+    [:small (str "Vrsta meda: " (:type p))]
+    [:hr]
+    [:h1 (:name p)]
+    [:small (str "Količina u gramima: " (:amount p)) ]
+    [:br]
+    [:small (str "Cena u dinarima: " (:price p))]
+    [:br]
+    [:small (str "Ambalaža: " (:packaging p))]
+    [:p (-> p :description markdown/md-to-html-string)]
+    [:hr]
+    (form/form-to
+      [:delete (str "/products/" (:_id p))]
+      (anti-forgery-field)
+      [:a.btn.btn-secondary {:href (str "/products") :style "margin-right:15px"} "Nazad"]
+      [:a.btn.btn-primary {:href (str "/products/" (:_id p) "/edit") :style "margin-right:15px"} "Izmeni"]
+      (form/submit-button {:class "btn btn-danger"} "Obriši"))
+    ))
+
+;Edit product and Add new product form
+(defn edit-product [p]
+  (template
+    (form/form-to
+      [:post (if p
+               (str "/products/" (:_id p))
+               "/products")
+       [:br]]
+      [:div.form-group
+       (form/label "name" "Naziv proizvoda")
+       (form/text-field {:class "form-control"} "name" (:name p))
+       [:br]]
+
+      [:div.form-group
+       (form/label "description" "Kratak opis")
+       (form/text-area {:class "form-control"} "description" (:description p))
+       [:br]]
+
+      [:div.form-group
+       (form/label "amount" "Količina")
+       (form/text-field {:class "form-control"} "amount" (:amount p))
+       [:br]]
+
+      [:div.form-group
+       (form/label "price" "Cena")
+       (form/text-field {:class "form-control"} "price" (:price p))
+       [:br]]
+
+      [:div.form-group
+       (form/label "packaging" "Ambalaža")
+       (form/text-field {:class "form-control"} "packaging" (:packaging p))
+       [:br]]
+
+      [:div.form-group
+       (form/label "type" "Vrsta meda")
+       (form/text-field {:class "form-control"} "type" (:type p))
+       [:br]]
+
+      [:div.form-group
+       (form/label "producer_id" "Proizvođač")
+       (form/text-field {:class "form-control"} "producer_id" (:producer_id p))
        [:br]]
 
       (anti-forgery-field)
