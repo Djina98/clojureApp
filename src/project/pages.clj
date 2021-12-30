@@ -28,15 +28,15 @@
         [:div.dropdown
          [:button.dropbtn "Proizvođači\n      " [:i.fa.fa-caret-down]]
          [:div.dropdown-content
-          [:a {:href "/producers/new"} "Dodaj novog"]
           [:a {:href "/"} "Pregled"]
+          [:a {:href "/producers/new"} "Dodaj novog"]
           ]]]
        [:li.nav-item
         [:div.dropdown
          [:button.dropbtn "Proizvodi\n      " [:i.fa.fa-caret-down]]
          [:div.dropdown-content
-          [:a {:href "/products/new"} "Dodaj novi"]
           [:a {:href "/products"} "Pregled"]
+          [:a {:href "/products/new"} "Dodaj novi"]
           ]]]]
        [:div.d-flex.align-items-center
         [:ul.navbar-nav
@@ -58,6 +58,24 @@
 ;Page with all producers, 3 producers per row
 (defn index [producers]
   (template
+    [:div {:class "row" :style "padding:15px;margin-left:10px"}
+     [:div {:class "col"}
+      [:a {:href (str "/") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Svi proizvođači"]
+      [:a {:href (str "/producers/" (str (get (into {} (db/get-certified-by-name "Sertifikovan organski")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Sertifikovani organski"]
+      [:a {:href (str "/producers/" (str (get (into {} (db/get-certified-by-name "Nema sertifikat")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Bez sertifikata"]
+      [:a {:href (str "/producers/" (str (get (into {} (db/get-certified-by-name "U periodu konverzije")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "U periodu konverzije"]]
+
+
+     [:div {:class "input-group rounded" :style "margin-top:20px"}
+      [:input {:type "search"
+               :id "form1"
+               :class "form-control rounded"
+               :placeholder "Pretraga"
+               :aria-label "Pretraga"
+               :aria-describedby "search-addon" }]
+      [:button {:type "button" :class "btn btn-success"}
+       [:i {:class "fa fa-search"}]]]
+     [:br]]
     [:div {:class "row" :style "padding:15px"}
     (for [p producers]
       [:div {:class "col-sm-4"}

@@ -9,8 +9,10 @@
             [project.admin :as admin]))
 
 (defroutes app-routes
+
            ;Routes for producers - all producers and producer details
            (GET "/" [] (pages/index (db/get-producers)))
+           (GET "/producers/:certified-id" [certified-id] (pages/index (db/get-producers-by-certified certified-id)))
            (GET "/producers/:producer-id" [producer-id] (pages/producer (db/get-producer-by-id producer-id)))
 
            ;Routes for products - all products and product details

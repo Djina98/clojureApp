@@ -55,6 +55,9 @@
 (defn get-producer-by-name [name]
   (mc/find-maps db producers-collection  {:name name}))
 
+(defn get-producers-by-certified [certified-id]
+  (mc/find-maps db producers-collection {:certified_id certified-id}))
+
 ;Products collection
 (defn create-product [name description amount price packaging type producer_id]
   (mc/insert db products-collection
