@@ -14,6 +14,7 @@
 
 ;Collections
 (def certified-collection "certified")
+(def packaging-collection "packaging")
 (def producers-collection "producers")
 (def products-collection "products")
 
@@ -24,6 +25,14 @@
   (mc/find-map-by-id db certified-collection (ObjectId. certified-id)))
 (defn get-certified-by-name [name]
   (mc/find-maps db certified-collection  {:name name}))
+
+;Packaging collection
+(defn get-packaging []
+  (mc/find-maps db packaging-collection))
+(defn get-packaging-by-id [packaging-id]
+  (mc/find-map-by-id db packaging-collection (ObjectId. packaging-id)))
+(defn get-packaging-by-name [name]
+  (mc/find-maps db packaging-collection  {:name name}))
 
 ;Producers collection
 (defn create-producer [name address contact description certified_id]
@@ -59,26 +68,26 @@
   (mc/find-maps db producers-collection {:certified_id certified-id}))
 
 ;Products collection
-(defn create-product [name description amount price packaging type producer_id]
+(defn create-product [name description amount price type producer_id packaging_id]
   (mc/insert db products-collection
              {:name name
               :description description
               :amount amount
               :price price
-              :packaging packaging
               :type type
-              :producer_id (str (get (into {} (get-producer-by-name producer_id)) :_id))}))
+              :producer_id (str (get (into {} (get-producer-by-name producer_id)) :_id))})
+              :packaging_id (str (get (into {} (get-packaging-by-name packaging_id)) :_id)))
 
-(defn update-product [product-id name description amount price packaging type producer_id]
+(defn update-product [product-id name description amount price type producer_id packaging_id]
   (mc/update-by-id db products-collection (ObjectId. product-id)
                    {$set
                     {:name name
                      :description description
                      :amount amount
                      :price price
-                     :packaging packaging
                      :type type
-                     :producer_id (str (get (into {} (get-producer-by-name producer_id)) :_id))}}))
+                     :producer_id (str (get (into {} (get-producer-by-name producer_id)) :_id))
+                     :packaging_id (str (get (into {} (get-packaging-by-name packaging_id)) :_id))}}))
 
 (defn delete-product [product-id]
   (mc/remove-by-id db products-collection (ObjectId. product-id)))
@@ -89,7 +98,7 @@
 (defn get-product-by-id [product-id]
   (mc/find-map-by-id db products-collection (ObjectId. product-id)))
 
-(defn get-products-by-packaging [packaging]
-  (mc/find-maps db products-collection  {:packaging packaging}))
+(defn get-products-by-packaging [packaging-id]
+  (mc/find-maps db products-collection  {:packaging_id packaging-id}))
 
 

@@ -61,10 +61,9 @@
     [:div {:class "row" :style "padding:15px;margin-left:10px"}
      [:div {:class "col"}
       [:a {:href (str "/") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Svi proizvođači"]
-      [:a {:href (str "/producers/" (str (get (into {} (db/get-certified-by-name "Sertifikovan organski")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Sertifikovani organski"]
-      [:a {:href (str "/producers/" (str (get (into {} (db/get-certified-by-name "Nema sertifikat")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Bez sertifikata"]
-      [:a {:href (str "/producers/" (str (get (into {} (db/get-certified-by-name "U periodu konverzije")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "U periodu konverzije"]]
-
+      [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "Sertifikovan organski")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Sertifikovani organski"]
+      [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "Nema sertifikat")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Bez sertifikata"]
+      [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "U periodu konverzije")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "U periodu konverzije"]]
 
      [:div {:class "input-group rounded" :style "margin-top:20px"}
       [:input {:type "search"
@@ -81,7 +80,6 @@
       [:div {:class "col-sm-4"}
       [:div {:class "card" :style "margin-bottom:30px"}
        [:div {:class "card-body"}
-        ;[:h5 {:class "card-text"} [:a {:href (str "/producers/" (:_id p))} (:name p)]]
         [:div {:class "row"}
          [:div {:class "col text-center"}
           [:a.btn.btn-outline-success {:href (str "/producers/" (:_id p)) :style "font-weight:bold"} (:name p)]]]
@@ -155,8 +153,8 @@
     [:div {:class "row" :style "padding:15px;margin-left:10px"}
      [:div {:class "col"}
       [:a {:href (str "/products") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Svi proizvodi"]
-      [:a {:href (str "/products/" "glassPackaging") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Proizvodi u staklenoj ambalaži"]
-      [:a {:href (str "/products/" "plasticPackaging") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Proizvodi u plastičnoj ambalaži"]]
+      [:a {:href (str "/products/packaging/" (str (get (into {} (db/get-packaging-by-name "Staklena teglica")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Proizvodi u staklenoj ambalaži"]
+      [:a {:href (str "/products/packaging/" (str (get (into {} (db/get-packaging-by-name "Plastična boca")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Proizvodi u plastičnoj ambalaži"]]
 
 
       [:div {:class "input-group rounded" :style "margin-top:20px"}
@@ -194,7 +192,7 @@
     [:br]
     [:small (str "Cena u dinarima: " (:price p))]
     [:br]
-    [:small (str "Ambalaža: " (:packaging p))]
+    [:small (str "Ambalaža: " ((into {} (db/get-packaging-by-id (:packaging_id p))) :name))]
     [:p (-> p :description markdown/md-to-html-string)]
     [:hr]
     (form/form-to
@@ -236,11 +234,6 @@
          [:br]]
 
         [:div.form-group
-         (form/label "packaging" "Ambalaža")
-         (form/text-field {:class "form-control"} "packaging" (:packaging p))
-         [:br]]
-
-        [:div.form-group
          (form/label "type" "Vrsta meda")
          (form/text-field {:class "form-control"} "type" (:type p))
          [:br]]
@@ -248,6 +241,11 @@
         [:div.form-group
          (form/label "producer_id" "Proizvođač")
          (form/drop-down {:class "form-control"} "producer_id"  (into [] (for [p (db/get-producers)] (get p :name)))  (if p (get (into {} (db/get-producer-by-id (:producer_id p))) :name)))
+         [:br]]
+
+        [:div.form-group
+         (form/label "packaging_id" "Ambalaža")
+         (form/drop-down {:class "form-control"} "packaging_id"  (into [] (for [pkg (db/get-packaging)] (get pkg :name)))  (if p (get (into {} (db/get-packaging-by-id (:packaging_id p))) :name)))
          [:br]]
 
         (anti-forgery-field)

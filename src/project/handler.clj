@@ -12,13 +12,12 @@
 
            ;Routes for producers - all producers and producer details
            (GET "/" [] (pages/index (db/get-producers)))
-           (GET "/producers/:certified-id" [certified-id] (pages/index (db/get-producers-by-certified certified-id)))
+           (GET "/producers/certified/:certified-id" [certified-id] (pages/index (db/get-producers-by-certified certified-id)))
            (GET "/producers/:producer-id" [producer-id] (pages/producer (db/get-producer-by-id producer-id)))
 
            ;Routes for products - all products and product details
            (GET "/products" [] (pages/products (db/get-products)))
-           (GET "/products/glassPackaging" [] (pages/products (db/get-products-by-packaging "Staklena teglica")))
-           (GET "/products/plasticPackaging" [] (pages/products (db/get-products-by-packaging "Plastična boca")))
+           (GET "/products/packaging/:packaging-id" [packaging-id] (pages/products (db/get-products-by-packaging packaging-id)))
            (GET "/products/:product-id" [product-id] (pages/product (db/get-product-by-id product-id)))
 
            ;Routes for admin login and logout
@@ -60,14 +59,14 @@
 
            ;Routes for new product
            (GET "/products/new" [] (pages/edit-product nil))
-           (POST "/products" [name description amount price packaging type producer_id]
-             (do (db/create-product name description amount price packaging type producer_id)
+           (POST "/products" [name description amount price type producer_id packaging_id]
+             (do (db/create-product name description amount price type producer_id  packaging_id)
                  (response/redirect "/products")))
 
            ;Routes for edit product
            (GET "/products/:product-id/edit" [product-id] (pages/edit-product (db/get-product-by-id product-id)))
-           (POST "/products/:product-id" [product-id name description amount price packaging type producer_id]
-             (do (db/update-product product-id name description amount price packaging type producer_id)
+           (POST "/products/:product-id" [product-id name description amount price type producer_id packaging_id]
+             (do (db/update-product product-id name description amount price type producer_id packaging_id)
                  (response/redirect (str "/products/" product-id))))
 
            ;Route for delete product
