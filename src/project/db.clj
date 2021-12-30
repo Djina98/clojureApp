@@ -41,6 +41,9 @@
 (defn get-producer-by-id [producer-id]
   (mc/find-map-by-id db producers-collection (ObjectId. producer-id)))
 
+(defn get-producer-by-name [name]
+  (mc/find-maps db producers-collection  {:name name}))
+
 (defn get-certified-by-value [value]
   (mc/find-maps db certified-collection  {:value value}))
 
@@ -63,7 +66,7 @@
                      :price price
                      :packaging packaging
                      :type type
-                     :producer_id producer_id}}))
+                     :producer_id (str (get (into {} (get-producer-by-name producer_id)) :_id))}}))
 
 (defn delete-product [product-id]
   (mc/remove-by-id db products-collection (ObjectId. product-id)))
@@ -73,4 +76,8 @@
 
 (defn get-product-by-id [product-id]
   (mc/find-map-by-id db products-collection (ObjectId. product-id)))
+
+(defn get-products-by-packaging [packaging]
+  (mc/find-maps db products-collection  {:packaging packaging}))
+
 

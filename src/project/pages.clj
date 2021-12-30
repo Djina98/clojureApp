@@ -44,7 +44,8 @@
           [:a {:href "/admin/login"} "Uloguj se"]]
          [:li.nav-item
           [:a {:href "/admin/logout"} "Odjavi se"]]]]]]
-     [:div.container {:style "margin-top:30px"} body]]))
+     [:div.container {:style "margin-top:30px"}
+      body]]))
 
 (def preview-length 270)
 
@@ -106,7 +107,7 @@
 
       [:div.form-group
        (form/label "description" "Kratak opis")
-       (form/text-area {:class "form-control"} "description" (:description p))
+       (form/text-area {:class "form-control" :rows "6"} "description" (:description p))
        [:br]]
 
       [:div.form-group
@@ -130,19 +131,35 @@
 ;Page with all products, 3 products per row
 (defn products [products]
   (template
+    [:div {:class "row" :style "padding:15px;margin-left:10px"}
+     [:div {:class "col"}
+      [:a {:href (str "/products") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Svi proizvodi"]
+      [:a {:href (str "/products/" "glassPackaging") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Proizvodi u staklenoj ambalaži"]
+      [:a {:href (str "/products/" "plasticPackaging") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Proizvodi u plastičnoj ambalaži"]]
+
+
+      [:div {:class "input-group rounded" :style "margin-top:20px"}
+       [:input {:type "search"
+                :id "form1"
+                :class "form-control rounded"
+                :placeholder "Pretraga"
+                :aria-label "Pretraga"
+                :aria-describedby "search-addon" }]
+       [:button {:type "button" :class "btn btn-success"}
+        [:i {:class "fa fa-search"}]]]
+     [:br]]
+
     [:div {:class "row" :style "padding:15px"}
      (for [p products]
-       [:div {:class "col-sm-4"}
-        [:div {:class "card" :style "margin-bottom:30px"}
-         [:div {:class "card-body"}
-          [:div {:class "row"}
-           [:div {:class "col text-center"}
-            [:a.btn.btn-outline-success {:href (str "/products/" (:_id p)) :style "font-weight:bold"} (:name p)]]]
-          [:p {:class "card-text"} (-> p :description cut-description markdown/md-to-html-string)]
-          ]]]
-       )]
-    [:br]
-    ))
+         [:div {:class "col-sm-4" :id "div-glass"}
+           [:div {:class "card" :style "margin-bottom:30px"}
+            [:div {:class "card-body"}
+             [:div {:class "row"}
+              [:div {:class "col text-center"}
+               [:a.btn.btn-outline-success {:href (str "/products/" (:_id p)) :style "font-weight:bold"} (:name p)]]]
+             [:p {:class "card-text"} (-> p :description cut-description markdown/md-to-html-string)]
+             ]]])]
+    [:br]))
 
 ;Product page
 (defn product [p]
@@ -170,49 +187,52 @@
 ;Edit product and Add new product form
 (defn edit-product [p]
   (template
-    (form/form-to
-      [:post (if p
-               (str "/products/" (:_id p))
-               "/products")
-       [:br]]
-      [:div.form-group
-       (form/label "name" "Naziv proizvoda")
-       (form/text-field {:class "form-control"} "name" (:name p))
-       [:br]]
+    [:div {:class "card"}
+     [:div {:class "card-body" :style "margin-bottom:20px"}
+      (form/form-to
+        [:post (if p
+                 (str "/products/" (:_id p))
+                 "/products")
+         [:br]]
+        [:div.form-group
+         (form/label "name" "Naziv proizvoda")
+         (form/text-field {:class "form-control"} "name" (:name p))
+         [:br]]
 
-      [:div.form-group
-       (form/label "description" "Kratak opis")
-       (form/text-area {:class "form-control"} "description" (:description p))
-       [:br]]
+        [:div.form-group
+         (form/label "description" "Kratak opis")
+         (form/text-area {:class "form-control" :rows "5"} "description" (:description p))
+         [:br]]
 
-      [:div.form-group
-       (form/label "amount" "Količina")
-       (form/text-field {:class "form-control"} "amount" (:amount p))
-       [:br]]
+        [:div.form-group
+         (form/label "amount" "Količina")
+         (form/text-field {:class "form-control"} "amount" (:amount p))
+         [:br]]
 
-      [:div.form-group
-       (form/label "price" "Cena")
-       (form/text-field {:class "form-control"} "price" (:price p))
-       [:br]]
+        [:div.form-group
+         (form/label "price" "Cena")
+         (form/text-field {:class "form-control"} "price" (:price p))
+         [:br]]
 
-      [:div.form-group
-       (form/label "packaging" "Ambalaža")
-       (form/text-field {:class "form-control"} "packaging" (:packaging p))
-       [:br]]
+        [:div.form-group
+         (form/label "packaging" "Ambalaža")
+         (form/text-field {:class "form-control"} "packaging" (:packaging p))
+         [:br]]
 
-      [:div.form-group
-       (form/label "type" "Vrsta meda")
-       (form/text-field {:class "form-control"} "type" (:type p))
-       [:br]]
+        [:div.form-group
+         (form/label "type" "Vrsta meda")
+         (form/text-field {:class "form-control"} "type" (:type p))
+         [:br]]
 
-      [:div.form-group
-       (form/label "producer_id" "Proizvođač")
-       (form/text-field {:class "form-control"} "producer_id" (:producer_id p))
-       [:br]]
+        [:div.form-group
+         (form/label "producer_id" "Proizvođač")
+         (form/drop-down {:class "form-control"} "producer_id"  (into [] (for [p (db/get-producers)] (get p :name)))  (get (into {} (db/get-producer-by-id (:producer_id p))) :name))
+         [:br]]
 
-      (anti-forgery-field)
+        (anti-forgery-field)
 
-      (form/submit-button {:class "btn btn-primary"} "Sačuvaj izmene"))))
+        (form/submit-button {:class "btn btn-primary"} "Sačuvaj izmene"))]]
+    ))
 
 ;Admin login page
 (defn admin-login [& [message]]

@@ -15,6 +15,8 @@
 
            ;Routes for products - all products and product details
            (GET "/products" [] (pages/products (db/get-products)))
+           (GET "/products/glassPackaging" [] (pages/products (db/get-products-by-packaging "Staklena teglica")))
+           (GET "/products/plasticPackaging" [] (pages/products (db/get-products-by-packaging "Plastična boca")))
            (GET "/products/:product-id" [product-id] (pages/product (db/get-product-by-id product-id)))
 
            ;Routes for admin login and logout

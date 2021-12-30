@@ -47,3 +47,8 @@
 .dropdown:hover .dropbtn {
   background-color: #198754;
 }
+
+label {
+  font-weight:bold;
+  color:#198754;
+}
