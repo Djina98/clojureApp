@@ -76,7 +76,7 @@
 ;Producer page
 (defn producer [p]
   (template
-    [:small ((into {} (db/get-certified-by-value (:certified_id p))) :name)]
+    [:small ((into {} (db/get-certified-by-id (:certified_id p))) :name)]
     [:hr]
     [:h1 (:name p)]
     [:small (:address p)]
@@ -95,38 +95,41 @@
 ;Edit producer and Add new producer form
 (defn edit-producer [p]
   (template
-    (form/form-to
-      [:post (if p
-               (str "/producers/" (:_id p))
-               "/producers")
-       [:br]]
-      [:div.form-group
-       (form/label "name" "Naziv proizvođača")
-       (form/text-field {:class "form-control"} "name" (:name p))
-       [:br]]
+    [:div {:class "card"}
+     [:div {:class "card-body" :style "margin-bottom:20px"}
+      (form/form-to
+        [:post (if p
+                 (str "/producers/" (:_id p))
+                 "/producers")
+         [:br]]
+        [:div.form-group
+         (form/label "name" "Naziv proizvođača")
+         (form/text-field {:class "form-control"} "name" (:name p))
+         [:br]]
 
-      [:div.form-group
-       (form/label "description" "Kratak opis")
-       (form/text-area {:class "form-control" :rows "6"} "description" (:description p))
-       [:br]]
+        [:div.form-group
+         (form/label "description" "Kratak opis")
+         (form/text-area {:class "form-control" :rows "6"} "description" (:description p))
+         [:br]]
 
-      [:div.form-group
-       (form/label "address" "Adresa")
-       (form/text-field {:class "form-control"} "address" (:address p))
-       [:br]]
+        [:div.form-group
+         (form/label "address" "Adresa")
+         (form/text-field {:class "form-control"} "address" (:address p))
+         [:br]]
 
-      [:div.form-group
-       (form/label "contact" "Kontakt")
-       (form/text-field {:class "form-control"} "contact" (:contact p))
-       [:br]]
+        [:div.form-group
+         (form/label "contact" "Kontakt")
+         (form/text-field {:class "form-control"} "contact" (:contact p))
+         [:br]]
 
-      [:div.form-group
-       (form/drop-down {:class "form-control"} "certified_id" [["Sertifikovan organski" 1]["U periodu konverzije" 2] ["Nema sertifikat" 3]]  (:certified_id p))
-       [:br]]
+        [:div.form-group
+         (form/label "certified_id" "Sertifikat")
+         (form/drop-down {:class "form-control"} "certified_id"  (into [] (for [c (db/get-certified)] (get c :name)))  (if p (get (into {} (db/get-certified-by-id (:certified_id p))) :name)))
+         [:br]]
 
-      (anti-forgery-field)
+        (anti-forgery-field)
 
-      (form/submit-button {:class "btn btn-primary"} "Sačuvaj izmene"))))
+        (form/submit-button {:class "btn btn-primary"} "Sačuvaj izmene"))]]))
 
 ;Page with all products, 3 products per row
 (defn products [products]
@@ -226,7 +229,7 @@
 
         [:div.form-group
          (form/label "producer_id" "Proizvođač")
-         (form/drop-down {:class "form-control"} "producer_id"  (into [] (for [p (db/get-producers)] (get p :name)))  (get (into {} (db/get-producer-by-id (:producer_id p))) :name))
+         (form/drop-down {:class "form-control"} "producer_id"  (into [] (for [p (db/get-producers)] (get p :name)))  (if p (get (into {} (db/get-producer-by-id (:producer_id p))) :name)))
          [:br]]
 
         (anti-forgery-field)
