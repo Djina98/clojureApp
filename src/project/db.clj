@@ -5,6 +5,13 @@
   (:import
     [org.bson.types ObjectId]))
 
+(defmacro ^{:private true} defoperator
+  [operator]
+  `(def ^{:const true} ~(symbol (str operator)) ~(str operator)))
+
+(defoperator $regex)
+(defoperator $toLower)
+
 ;Connection parametars
 (def db-connection-uri (or (System/getenv "PROJECT_MONGO_URI")
                            "mongodb://127.0.0.1/project"))
@@ -100,5 +107,11 @@
 
 (defn get-products-by-packaging [packaging-id]
   (mc/find-maps db products-collection  {:packaging_id packaging-id}))
+
+(defn searchProducers [keyword]
+  (mc/find-maps db producers-collection {:name {$regex (str ".*" keyword ".*")}}))
+
+(defn searchProducts [keyword]
+  (mc/find-maps db products-collection {:name {$regex (str ".*" keyword ".*")}}))
 
 

@@ -11,13 +11,15 @@
 (defroutes app-routes
 
            ;Routes for producers - all producers and producer details
-           (GET "/" [] (pages/index (db/get-producers)))
-           (GET "/producers/certified/:certified-id" [certified-id] (pages/index (db/get-producers-by-certified certified-id)))
+           (GET "/" [] (pages/producers (db/get-producers)))
+           (GET "/producers/certified/:certified-id" [certified-id] (pages/producers (db/get-producers-by-certified certified-id)))
+           (GET "/producers/keyword/:keyword" [keyword] (pages/producers (db/searchProducers keyword)))
            (GET "/producers/:producer-id" [producer-id] (pages/producer (db/get-producer-by-id producer-id)))
 
            ;Routes for products - all products and product details
            (GET "/products" [] (pages/products (db/get-products)))
            (GET "/products/packaging/:packaging-id" [packaging-id] (pages/products (db/get-products-by-packaging packaging-id)))
+           (GET "/products/keyword/:keyword" [keyword] (pages/products (db/searchProducts keyword)))
            (GET "/products/:product-id" [product-id] (pages/product (db/get-product-by-id product-id)))
 
            ;Routes for admin login and logout

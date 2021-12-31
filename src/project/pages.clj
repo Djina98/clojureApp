@@ -17,7 +17,12 @@
              :crossorigin "anonymous"}]
      [:link {:rel "stylesheet"
              :href "/style.css"}]
-     ]
+     [:script "function searchInProducers() {
+          var keyword = document.getElementById(\"searchProducers\").value;
+          window.location.href = \"/producers/keyword/\" + keyword;}"]
+     [:script "function searchInProducts() {
+          var keyword = document.getElementById(\"searchProducts\").value;
+          window.location.href = \"/products/keyword/\" + keyword;}"]]
     [:body
      [:nav.navbar.navbar-expand-sm.bg-success.navbar-dark
      [:div.container-fluid
@@ -56,7 +61,7 @@
     description))
 
 ;Page with all producers, 3 producers per row
-(defn index [producers]
+(defn producers [producers]
   (template
     [:div {:class "row" :style "padding:15px;margin-left:10px"}
      [:div {:class "col"}
@@ -64,15 +69,14 @@
       [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "Sertifikovan organski")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Sertifikovani organski"]
       [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "Nema sertifikat")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Bez sertifikata"]
       [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "U periodu konverzije")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "U periodu konverzije"]]
-
      [:div {:class "input-group rounded" :style "margin-top:20px"}
       [:input {:type "search"
-               :id "form1"
+               :id "searchProducers"
                :class "form-control rounded"
-               :placeholder "Pretraga"
+               :placeholder "Pretraži proizvođače po nazivu"
                :aria-label "Pretraga"
-               :aria-describedby "search-addon" }]
-      [:button {:type "button" :class "btn btn-success"}
+               :aria-describedby "search-addon"}]
+      [:button {:type "button" :id "btnSearchProducers" :class "btn btn-success" :onClick "searchInProducers()"}
        [:i {:class "fa fa-search"}]]]
      [:br]]
     [:div {:class "row" :style "padding:15px"}
@@ -155,19 +159,16 @@
       [:a {:href (str "/products") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Svi proizvodi"]
       [:a {:href (str "/products/packaging/" (str (get (into {} (db/get-packaging-by-name "Staklena teglica")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Proizvodi u staklenoj ambalaži"]
       [:a {:href (str "/products/packaging/" (str (get (into {} (db/get-packaging-by-name "Plastična boca")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Proizvodi u plastičnoj ambalaži"]]
-
-
-      [:div {:class "input-group rounded" :style "margin-top:20px"}
-       [:input {:type "search"
-                :id "form1"
-                :class "form-control rounded"
-                :placeholder "Pretraga"
-                :aria-label "Pretraga"
-                :aria-describedby "search-addon" }]
-       [:button {:type "button" :class "btn btn-success"}
-        [:i {:class "fa fa-search"}]]]
+     [:div {:class "input-group rounded" :style "margin-top:20px"}
+      [:input {:type "search"
+               :id "searchProducts"
+               :class "form-control rounded"
+               :placeholder "Pretraži proizvode po nazivu"
+               :aria-label "Pretraga"
+               :aria-describedby "search-addon"}]
+      [:button {:type "button" :id "btnSearchProducts" :class "btn btn-success" :onClick "searchInProducts()"}
+       [:i {:class "fa fa-search"}]]]
      [:br]]
-
     [:div {:class "row" :style "padding:15px"}
      (for [p products]
          [:div {:class "col-sm-4" :id "div-glass"}
