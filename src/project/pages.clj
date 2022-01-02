@@ -17,12 +17,14 @@
              :crossorigin "anonymous"}]
      [:link {:rel "stylesheet"
              :href "/style.css"}]
+
      [:script "function searchInProducers() {
           var keyword = document.getElementById(\"searchProducers\").value;
           window.location.href = \"/producers/keyword/\" + keyword;}"]
      [:script "function searchInProducts() {
           var keyword = document.getElementById(\"searchProducts\").value;
-          window.location.href = \"/products/keyword/\" + keyword;}"]]
+          window.location.href = \"/products/keyword/\" + keyword;}"]
+     ]
     [:body
      [:nav.navbar.navbar-expand-sm.bg-success.navbar-dark
      [:div.container-fluid
@@ -50,7 +52,8 @@
          [:li.nav-item
           [:a {:href "/admin/logout"} "Odjavi se"]]]]]]
      [:div.container {:style "margin-top:30px"}
-      body]]))
+      body]
+     [:script {:src "/searchProducers.js"}]]))
 
 (def preview-length 270)
 
@@ -73,7 +76,7 @@
       [:input {:type "search"
                :id "searchProducers"
                :class "form-control rounded"
-               :placeholder "Pretraži proizvođače po nazivu"
+               :placeholder "Pretraži proizvođače"
                :aria-label "Pretraga"
                :aria-describedby "search-addon"}]
       [:button {:type "button" :id "btnSearchProducers" :class "btn btn-success" :onClick "searchInProducers()"}
@@ -163,7 +166,7 @@
       [:input {:type "search"
                :id "searchProducts"
                :class "form-control rounded"
-               :placeholder "Pretraži proizvode po nazivu"
+               :placeholder "Pretraži proizvode"
                :aria-label "Pretraga"
                :aria-describedby "search-addon"}]
       [:button {:type "button" :id "btnSearchProducts" :class "btn btn-success" :onClick "searchInProducts()"}

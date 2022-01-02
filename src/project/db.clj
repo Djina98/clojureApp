@@ -11,6 +11,7 @@
 
 (defoperator $regex)
 (defoperator $toLower)
+(defoperator $or)
 
 ;Connection parametars
 (def db-connection-uri (or (System/getenv "PROJECT_MONGO_URI")
@@ -109,9 +110,18 @@
   (mc/find-maps db products-collection  {:packaging_id packaging-id}))
 
 (defn searchProducers [keyword]
-  (mc/find-maps db producers-collection {:name {$regex (str ".*" keyword ".*")}}))
+  (mc/find-maps db producers-collection {$or [{:name {$regex (str ".*" keyword ".*")}}
+                                              {:address {$regex (str ".*" keyword ".*")}}
+                                              {:contact {$regex (str ".*" keyword ".*")}}
+                                              {:description {$regex (str ".*" keyword ".*")}}]
+                                         }))
 
 (defn searchProducts [keyword]
-  (mc/find-maps db products-collection {:name {$regex (str ".*" keyword ".*")}}))
+  (mc/find-maps db products-collection {$or [{:name {$regex (str ".*" keyword ".*")}}
+                                             {:description {$regex (str ".*" keyword ".*")}}
+                                             {:amount {$regex (str ".*" keyword ".*")}}
+                                             {:price {$regex (str ".*" keyword ".*")}}
+                                             {:type {$regex (str ".*" keyword ".*")}}]
+                                        }))
 
 
