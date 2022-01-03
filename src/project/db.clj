@@ -12,6 +12,7 @@
 (defoperator $regex)
 (defoperator $toLower)
 (defoperator $or)
+(defoperator $sort)
 
 ;Connection parametars
 (def db-connection-uri (or (System/getenv "PROJECT_MONGO_URI")
@@ -110,7 +111,7 @@
   (mc/find-maps db products-collection  {:packaging_id packaging-id}))
 
 (defn get-products-by-producer [producer-id]
-  (mc/find-maps db products-collection {:producer_id producer-id}))
+  (mc/find-maps db products-collection  {:producer_id producer-id}))
 
 ;Search producers
 (defn searchProducers [keyword]
@@ -129,5 +130,6 @@
                                              {:type {$regex (str ".*" keyword ".*")}}
                                              {:producer_id (str (:_id (into {} (get-producer-by-name {$regex (str ".*" keyword ".*")}))))}]
                                         }))
+
 
 

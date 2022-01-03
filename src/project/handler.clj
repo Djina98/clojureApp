@@ -19,8 +19,10 @@
            ;Routes for products - all products and product details
            (GET "/products" [] (pages/products (db/get-products)))
            (GET "/products/packaging/:packaging-id" [packaging-id] (pages/products (db/get-products-by-packaging packaging-id)))
+           (GET "/products/producer/:producer-id" [producer-id] (pages/products (db/get-products-by-producer producer-id)))
            (GET "/products/keyword/:keyword" [keyword] (pages/products (db/searchProducts keyword)))
            (GET "/products/:product-id" [product-id] (pages/product (db/get-product-by-id product-id)))
+
 
 
            ;Routes for admin login and logout

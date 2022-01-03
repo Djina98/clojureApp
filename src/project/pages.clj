@@ -31,20 +31,21 @@
       [:ul.navbar-nav
        [:li.nav-item
         [:a.navbar-brand {:href "/" :style "font-weight:bold;font-size:20px"} "Bee organic"]]
+     [:li.nav-item
+       [:div.dropdown
+        [:button.dropbtn "Proizvođači\n      " [:i.fa.fa-caret-down]]
+        [:div.dropdown-content
+         [:a {:href "/"} "Pregled"]
+         [:a {:href "/producers/new"} "Dodaj novog"]
+         ]]]
        [:li.nav-item
-        [:div.dropdown
-         [:button.dropbtn "Proizvođači\n      " [:i.fa.fa-caret-down]]
-         [:div.dropdown-content
-          [:a {:href "/"} "Pregled"]
-          [:a {:href "/producers/new"} "Dodaj novog"]
-          ]]]
-       [:li.nav-item
-        [:div.dropdown
-         [:button.dropbtn "Proizvodi\n      " [:i.fa.fa-caret-down]]
-         [:div.dropdown-content
-          [:a {:href "/products"} "Pregled"]
-          [:a {:href "/products/new"} "Dodaj novi"]
-          ]]]]
+       [:div.dropdown
+        [:button.dropbtn "Proizvodi\n      " [:i.fa.fa-caret-down]]
+        [:div.dropdown-content
+         [:a {:href "/products"} "Pregled"]
+         [:a {:href "/products/new"} "Dodaj novi"]
+         ]]]
+      ]
        [:div.d-flex.align-items-center
         [:ul.navbar-nav
          [:li.nav-item
@@ -68,10 +69,14 @@
   (template
     [:div {:class "row" :style "padding:15px;margin-left:10px"}
      [:div {:class "col"}
-      [:a {:href (str "/") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Svi proizvođači"]
-      [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "Sertifikovan organski")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Sertifikovani organski"]
-      [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "Nema sertifikat")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Bez sertifikata"]
-      [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "U periodu konverzije")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "U periodu konverzije"]]
+      [:div.dropdown {:style "margin-right:20px"}
+       [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Filtriraj po sertifikatima\n      " [:i.fa.fa-caret-down]]
+       [:div.dropdown-content
+        [:a {:href (str "/")} "Svi proizvođači"]
+        [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "Sertifikovan organski")) :_id)))} "Sertifikovan organski"]
+        [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "Nema sertifikat")) :_id)))} "Nema sertifikat"]
+        [:a {:href (str "/producers/certified/" (str (get (into {} (db/get-certified-by-name "U periodu konverzije")) :_id)))} "U periodu konverzije"]
+        ]]]
      [:div {:class "input-group rounded" :style "margin-top:20px"}
       [:input {:type "search"
                :id "searchProducers"
@@ -164,9 +169,29 @@
   (template
     [:div {:class "row" :style "padding:15px;margin-left:10px"}
      [:div {:class "col"}
-      [:a {:href (str "/products") :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Svi proizvodi"]
-      [:a {:href (str "/products/packaging/" (str (get (into {} (db/get-packaging-by-name "Staklena teglica")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Proizvodi u staklenoj ambalaži"]
-      [:a {:href (str "/products/packaging/" (str (get (into {} (db/get-packaging-by-name "Plastična boca")) :_id))) :type "button" :class "btn btn-outline-success" :style "margin-right:10px"} "Proizvodi u plastičnoj ambalaži"]]
+      [:div.dropdown {:style "margin-right:20px"}
+       [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Sortiraj po ceni\n      " [:i.fa.fa-caret-down]]
+       [:div.dropdown-content
+        [:a {:href "/products/sort-by-price-asc"} "Rastuće"]
+        [:a {:href "/products/sort-by-price-desc"} "Opadajuće"]
+        ]]
+
+      [:div.dropdown {:style "margin-right:20px"}
+       [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Filtriraj po ambalaži\n      " [:i.fa.fa-caret-down]]
+       [:div.dropdown-content
+        [:a {:href (str "/products")} "Svi proizvodi"]
+        [:a {:href (str "/products/packaging/" (str (get (into {} (db/get-packaging-by-name "Staklena teglica")) :_id)))} "Proizvodi u staklenoj ambalaži"]
+        [:a {:href (str "/products/packaging/" (str (get (into {} (db/get-packaging-by-name "Plastična boca")) :_id)))} "Proizvodi u plastičnoj ambalaži"]
+        ]]
+
+      [:div.dropdown {:style "margin-right:20px"}
+       [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Filtriraj po proizvođaču\n      " [:i.fa.fa-caret-down]]
+       [:div.dropdown-content
+        [:a {:href (str "/products")} "Svi proizvodi"]
+        (for [p products]
+          [:a {:href (str "/products/producer/" (:producer_id p))} (get (into {} (db/get-producer-by-id (:producer_id p))) :name)])
+        ]]]
+
      [:div {:class "input-group rounded" :style "margin-top:20px"}
       [:input {:type "search"
                :id "searchProducts"
