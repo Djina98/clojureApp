@@ -109,6 +109,10 @@
 (defn get-products-by-packaging [packaging-id]
   (mc/find-maps db products-collection  {:packaging_id packaging-id}))
 
+(defn get-products-by-producer [producer-id]
+  (mc/find-maps db products-collection {:producer_id producer-id}))
+
+;Search producers
 (defn searchProducers [keyword]
   (mc/find-maps db producers-collection {$or [{:name {$regex (str ".*" keyword ".*")}}
                                               {:address {$regex (str ".*" keyword ".*")}}
@@ -116,12 +120,14 @@
                                               {:description {$regex (str ".*" keyword ".*")}}]
                                          }))
 
+;Search products
 (defn searchProducts [keyword]
   (mc/find-maps db products-collection {$or [{:name {$regex (str ".*" keyword ".*")}}
                                              {:description {$regex (str ".*" keyword ".*")}}
                                              {:amount {$regex (str ".*" keyword ".*")}}
                                              {:price {$regex (str ".*" keyword ".*")}}
-                                             {:type {$regex (str ".*" keyword ".*")}}]
+                                             {:type {$regex (str ".*" keyword ".*")}}
+                                             {:producer_id (str (:_id (into {} (get-producer-by-name {$regex (str ".*" keyword ".*")}))))}]
                                         }))
 
 

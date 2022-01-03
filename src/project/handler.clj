@@ -22,6 +22,7 @@
            (GET "/products/keyword/:keyword" [keyword] (pages/products (db/searchProducts keyword)))
            (GET "/products/:product-id" [product-id] (pages/product (db/get-product-by-id product-id)))
 
+
            ;Routes for admin login and logout
            (GET "/admin/login" [:as {session :session}]
              (if (:admin session)

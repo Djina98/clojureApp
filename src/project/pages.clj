@@ -53,7 +53,7 @@
           [:a {:href "/admin/logout"} "Odjavi se"]]]]]]
      [:div.container {:style "margin-top:30px"}
       body]
-     [:script {:src "/searchProducers.js"}]]))
+     [:script {:src "/search.js"}]]))
 
 (def preview-length 270)
 
@@ -89,7 +89,10 @@
        [:div {:class "card-body"}
         [:div {:class "row"}
          [:div {:class "col text-center"}
-          [:a.btn.btn-outline-success {:href (str "/producers/" (:_id p)) :style "font-weight:bold"} (:name p)]]]
+          [:a.btn.btn-outline-success {:href (str "/producers/" (:_id p)) :style "font-weight:bold"} (:name p)]
+          ;[:a.btn.btn-outline-success {:href (str "/products/producers/" (:_id p)) :style "font-weight:bold"} "Ponuda"]
+          ]]
+
         [:p {:class "card-text"} (-> p :description cut-description markdown/md-to-html-string)]
         ]]]
       )]
@@ -99,12 +102,14 @@
 ;Producer page
 (defn producer [p]
   (template
-    [:small ((into {} (db/get-certified-by-id (:certified_id p))) :name)]
     [:hr]
     [:h1 (:name p)]
-    [:small (:address p)]
     [:br]
-    [:small (:contact p)]
+    [:small ((into {} (db/get-certified-by-id (:certified_id p))) :name)]
+    [:br]
+    [:small (str "Adresa: " (:address p))]
+    [:br]
+    [:small (str "Kontakt: " (:contact p))]
     [:p (-> p :description markdown/md-to-html-string)]
     [:hr]
     (form/form-to
