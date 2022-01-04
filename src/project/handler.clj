@@ -13,12 +13,14 @@
            ;Routes for producers
            (GET "/" [] (pages/producers (db/get-producers)))
            (GET "/producers/certified/:certified-id" [certified-id] (pages/producers (db/get-producers-by-certified certified-id)))
-           (GET "/producers/keyword/:keyword" [keyword] (pages/producers (db/searchProducers keyword)))
+           (GET "/producers/keyword/:keyword" [keyword] (pages/producers (db/search-producers keyword)))
            (GET "/producers/:producer-id" [producer-id] (pages/producer (db/get-producer-by-id producer-id) (db/get-reviews-for-producer producer-id)))
 
-           ;Routes for reviews on producers
+           ;Routes for producer-reviews
            (GET "/producer-reviews" [] (pages/producer-reviews (db/get-all-producer-reviews)))
+           (GET "/producer-reviews/keyword/:keyword" [keyword] (pages/producer-reviews (db/search-producer-reviews keyword)))
            (GET "/producer-reviews/:producer-id/new" [producer-id] (pages/add-producer-review (db/get-producer-by-id producer-id)))
+           (GET "/producer-reviews/rating/:rating" [rating] (pages/producer-reviews (db/get-reviews-by-rating rating)))
            (POST "/producer-reviews" [producer-id review rating]
              (do (db/create-producer-review producer-id review rating)
                  (response/redirect (str "/producers/" producer-id))))
@@ -27,7 +29,7 @@
            (GET "/products" [] (pages/products (db/get-products)))
            (GET "/products/packaging/:packaging-id" [packaging-id] (pages/products (db/get-products-by-packaging packaging-id)))
            (GET "/products/producer/:producer-id" [producer-id] (pages/products (db/get-products-by-producer producer-id)))
-           (GET "/products/keyword/:keyword" [keyword] (pages/products (db/searchProducts keyword)))
+           (GET "/products/keyword/:keyword" [keyword] (pages/products (db/search-products keyword)))
            (GET "/products/:product-id" [product-id] (pages/product (db/get-product-by-id product-id)))
 
            ;Routes for admin login and logout

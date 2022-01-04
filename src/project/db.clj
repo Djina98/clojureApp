@@ -62,6 +62,14 @@
                  :description description
                  :certified_id (str (get (into {} (get-certified-by-name certified_id)) :_id))}}))
 
+;Search producers
+(defn search-producers [keyword]
+  (mc/find-maps db producers-collection {$or [{:name {$regex (str ".*" keyword ".*")}}
+                                              {:address {$regex (str ".*" keyword ".*")}}
+                                              {:contact {$regex (str ".*" keyword ".*")}}
+                                              {:description {$regex (str ".*" keyword ".*")}}]
+                                         }))
+
 (defn delete-producer [producer-id]
   (mc/remove-by-id db producers-collection (ObjectId. producer-id)))
 
@@ -114,16 +122,8 @@
 (defn get-products-by-producer [producer-id]
   (mc/find-maps db products-collection  {:producer_id producer-id}))
 
-;Search producers
-(defn searchProducers [keyword]
-  (mc/find-maps db producers-collection {$or [{:name {$regex (str ".*" keyword ".*")}}
-                                              {:address {$regex (str ".*" keyword ".*")}}
-                                              {:contact {$regex (str ".*" keyword ".*")}}
-                                              {:description {$regex (str ".*" keyword ".*")}}]
-                                         }))
-
 ;Search products
-(defn searchProducts [keyword]
+(defn search-products [keyword]
   (mc/find-maps db products-collection {$or [{:name {$regex (str ".*" keyword ".*")}}
                                              {:description {$regex (str ".*" keyword ".*")}}
                                              {:amount {$regex (str ".*" keyword ".*")}}
@@ -142,5 +142,14 @@
 (defn get-reviews-for-producer [producer-id]
   (mc/find-maps db producer-reviews-collection {:producer_id producer-id}))
 
+(defn get-reviews-by-rating [rating]
+  (mc/find-maps db producer-reviews-collection {:rating rating}))
+
 (defn get-all-producer-reviews []
   (mc/find-maps db producer-reviews-collection))
+
+;Search producer-reviews
+(defn search-producer-reviews [keyword]
+  (mc/find-maps db producer-reviews-collection {$or [{:review {$regex (str ".*" keyword ".*")}}
+                                                     {:rating {$regex (str ".*" keyword ".*")}}
+                                                     {:producer_id (str (:_id (into {} (get-producer-by-name {$regex (str ".*" keyword ".*")}))))}]}))

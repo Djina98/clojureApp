@@ -24,6 +24,9 @@
      [:script "function searchInProducts() {
           var keyword = document.getElementById(\"searchProducts\").value;
           window.location.href = \"/products/keyword/\" + keyword;}"]
+     [:script "function searchInProducerReviews() {
+          var keyword = document.getElementById(\"searchProducerReviews\").value;
+          window.location.href = \"/producer-reviews/keyword/\" + keyword;}"]
      ]
     [:body
      [:nav.navbar.navbar-expand-sm.bg-success.navbar-dark
@@ -312,25 +315,24 @@
       [:div.dropdown {:style "margin-right:20px"}
        [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Filtriraj po oceni\n      " [:i.fa.fa-caret-down]]
        [:div.dropdown-content
-        [:a {:href (str "/products")} "Svi utisci"]
+        [:a {:href (str "/producer-reviews")} "Svi utisci"]
+        [:a {:href (str "/producer-reviews/rating/5")} "Ocena 5"]
+        [:a {:href (str "/producer-reviews/rating/4")} "Ocena 4"]
+        [:a {:href (str "/producer-reviews/rating/3")} "Ocena 3"]
+        [:a {:href (str "/producer-reviews/rating/2")} "Ocena 2"]
+        [:a {:href (str "/producer-reviews/rating/1")} "Ocena 1"]
         ]]
-
-      [:div.dropdown {:style "margin-right:20px"}
-       [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Filtriraj po proizvođaču\n      " [:i.fa.fa-caret-down]]
-       [:div.dropdown-content
-        [:a {:href (str "/products")} "Svi proizvodi"]
-        ]]]
 
      [:div {:class "input-group rounded" :style "margin-top:20px"}
       [:input {:type "search"
-               :id "searchProducts"
+               :id "searchProducerReviews"
                :class "form-control rounded"
-               :placeholder "Pretraži proizvode"
+               :placeholder "Pretraži utiske"
                :aria-label "Pretraga"
                :aria-describedby "search-addon"}]
-      [:button {:type "button" :id "btnSearchProducts" :class "btn btn-success" :onClick "searchInProducts()"}
+      [:button {:type "button" :id "btnSearchProducerReviews" :class "btn btn-success" :onClick "searchInProducerReviews()"}
        [:i {:class "fa fa-search"}]]]
-     [:br]]
+     [:br]]]
     [:div {:class "row" :style "padding:15px"}
      (for [r reviews]
        [:div {:class "col-sm-4" :id "div-glass"}
@@ -338,8 +340,9 @@
          [:div {:class "card-body"}
           [:div {:class "row"}
            [:div {:class "col text-center"}
-            [:a.btn.btn-outline-success {:style "font-weight:bold"} (:rating r)]]]
-          [:p {:class "card-text"} (:review r)]
+            [:a.btn.btn-outline-success {:style "font-weight:bold;margin-bottom:20px"} ((into {} (db/get-producer-by-id (:producer_id r))) :name)]]]
+          [:p {:class "card-text" :style "text-align:center"} (str "Ocena: " (:rating r))]
+          [:p {:class "card-text" :style "text-align:center"} (:review r)]
           ]]])]
     [:br]))
 
