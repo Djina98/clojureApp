@@ -5,6 +5,12 @@
             [project.db :as db]
             [ring.util.anti-forgery :refer [anti-forgery-field]]))
 
+(defn calculate-average-rating [producer-reviews]
+  (def sum (atom 0))
+  (for [r producer-reviews]
+    (double (/ (swap! sum #(+ % (Integer/parseInt (:rating r)))) (count producer-reviews)))
+    )
+  )
 ;Header and navbar
 (defn template [& body]
   (html5
@@ -113,7 +119,17 @@
 (defn producer [p reviews]
   (template
     [:div {:style "text-align:center"}
-     [:a.btn.btn-outline-success {:href (str "/producer-reviews/" (:_id p) "/new") :style "margin-right:15px;font-weight:bold"} "Ostavi utisak o ovom proizvođaču"]
+     [:div {:class "row"}
+      [:div {:class "col"}
+       [:br]
+       [:a.btn.btn-outline-success {:href (str "/producer-reviews/" (:_id p) "/new") :style "margin-right:15px;font-weight:bold"} "Ostavi utisak o ovom proizvođaču"]
+       ]
+      [:div {:class "col" :style "border:1px solid black;"}
+       [:h6 {:style "margin-top:10px"} "Prosečna ocena:"]
+       [:h1 (if (not-empty (calculate-average-rating reviews)) (nth (into [] (calculate-average-rating reviews)) (dec (count (calculate-average-rating reviews)))))]
+       [:p (if (empty? (calculate-average-rating reviews)) "Ocena nije dostupna")]
+       ]
+      ]
     [:hr]
     [:h1 (:name p)]
     [:br]
