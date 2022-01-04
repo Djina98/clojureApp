@@ -88,6 +88,8 @@
        [:i {:class "fa fa-search"}]]]
      [:br]]
     [:div {:class "row" :style "padding:15px"}
+     [:p {:style "text-align:center;margin-bottom:20px"} (if (empty? producers) "Još uvek nema dostupnih proizvođača")]
+
     (for [p producers]
       [:div {:class "col-sm-4"}
       [:div {:class "card" :style "margin-bottom:30px"}
@@ -105,8 +107,10 @@
     ))
 
 ;Producer page
-(defn producer [p]
+(defn producer [p reviews]
   (template
+    [:div {:style "text-align:center"}
+     [:a.btn.btn-outline-success {:href (str "/producer-reviews/" (:_id p) "/new") :style "margin-right:15px;font-weight:bold"} "Ostavi utisak o ovom proizvođaču"]
     [:hr]
     [:h1 (:name p)]
     [:br]
@@ -116,13 +120,30 @@
     [:br]
     [:small (str "Kontakt: " (:contact p))]
     [:p (-> p :description markdown/md-to-html-string)]
-    [:hr]
     (form/form-to
       [:delete (str "/producers/" (:_id p))]
       (anti-forgery-field)
       [:a.btn.btn-secondary {:href (str "/") :style "margin-right:15px"} "Nazad"]
       [:a.btn.btn-primary {:href (str "/producers/" (:_id p) "/edit") :style "margin-right:15px"} "Izmeni"]
-      (form/submit-button {:class "btn btn-danger"} "Obriši"))
+      (form/submit-button {:class "btn btn-danger"} "Obriši"))]
+    [:hr]
+    [:div {:class "row" :style "padding:15px"}
+     [:h3 {:style "text-align:center;margin-bottom:20px"} "Utisci"]
+     [:p {:style "text-align:center;margin-bottom:20px"} (if (empty? reviews) "Još uvek nema dostupnih utisaka")]
+
+     (for [r reviews]
+       [:div {:class "col-sm-4"}
+        [:div {:class "card" :style "margin-bottom:30px"}
+         [:div {:class "card-body"}
+          [:div {:class "row"}
+           [:div {:class "col text-center"}
+            [:a.btn.btn-outline-success {:href (str "/producers/" (:_id p)) :style "font-weight:bold"} (:rating r)]
+            ;[:a.btn.btn-outline-success {:href (str "/products/producers/" (:_id p)) :style "font-weight:bold"} "Ponuda"]
+            ]]
+
+          [:p {:class "card-text"} (:review r)]
+          ]]]
+       )]
     ))
 
 ;Edit producer and Add new producer form
@@ -162,20 +183,14 @@
 
         (anti-forgery-field)
 
-        (form/submit-button {:class "btn btn-primary"} "Sačuvaj izmene"))]]))
+        [:div {:style "text-align:center"}
+         (form/submit-button {:class "btn btn-primary"} "Sačuvaj")])]]))
 
 ;Page with all products, 3 products per row
 (defn products [products]
   (template
     [:div {:class "row" :style "padding:15px;margin-left:10px"}
      [:div {:class "col"}
-      [:div.dropdown {:style "margin-right:20px"}
-       [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Sortiraj po ceni\n      " [:i.fa.fa-caret-down]]
-       [:div.dropdown-content
-        [:a {:href "/products/sort-by-price-asc"} "Rastuće"]
-        [:a {:href "/products/sort-by-price-desc"} "Opadajuće"]
-        ]]
-
       [:div.dropdown {:style "margin-right:20px"}
        [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Filtriraj po ambalaži\n      " [:i.fa.fa-caret-down]]
        [:div.dropdown-content
@@ -203,6 +218,8 @@
        [:i {:class "fa fa-search"}]]]
      [:br]]
     [:div {:class "row" :style "padding:15px"}
+     [:p {:style "text-align:center;margin-bottom:20px"} (if (empty? products) "Još uvek nema dostupnih proizvoda")]
+
      (for [p products]
          [:div {:class "col-sm-4" :id "div-glass"}
            [:div {:class "card" :style "margin-bottom:30px"}
@@ -284,8 +301,76 @@
 
         (anti-forgery-field)
 
-        (form/submit-button {:class "btn btn-primary"} "Sačuvaj izmene"))]]
-    ))
+        [:div {:style "text-align:center"}
+         (form/submit-button {:class "btn btn-primary"} "Sačuvaj")])]]))
+
+;Page with all producer-reviews - 3 reviews per row
+(defn producer-reviews [reviews]
+  (template
+    [:div {:class "row" :style "padding:15px;margin-left:10px"}
+     [:div {:class "col"}
+      [:div.dropdown {:style "margin-right:20px"}
+       [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Filtriraj po oceni\n      " [:i.fa.fa-caret-down]]
+       [:div.dropdown-content
+        [:a {:href (str "/products")} "Svi utisci"]
+        ]]
+
+      [:div.dropdown {:style "margin-right:20px"}
+       [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Filtriraj po proizvođaču\n      " [:i.fa.fa-caret-down]]
+       [:div.dropdown-content
+        [:a {:href (str "/products")} "Svi proizvodi"]
+        ]]]
+
+     [:div {:class "input-group rounded" :style "margin-top:20px"}
+      [:input {:type "search"
+               :id "searchProducts"
+               :class "form-control rounded"
+               :placeholder "Pretraži proizvode"
+               :aria-label "Pretraga"
+               :aria-describedby "search-addon"}]
+      [:button {:type "button" :id "btnSearchProducts" :class "btn btn-success" :onClick "searchInProducts()"}
+       [:i {:class "fa fa-search"}]]]
+     [:br]]
+    [:div {:class "row" :style "padding:15px"}
+     (for [r reviews]
+       [:div {:class "col-sm-4" :id "div-glass"}
+        [:div {:class "card" :style "margin-bottom:30px"}
+         [:div {:class "card-body"}
+          [:div {:class "row"}
+           [:div {:class "col text-center"}
+            [:a.btn.btn-outline-success {:style "font-weight:bold"} (:rating r)]]]
+          [:p {:class "card-text"} (:review r)]
+          ]]])]
+    [:br]))
+
+;Add producer-review form
+(defn add-producer-review [p]
+  (template
+    [:div {:class "card"}
+     [:div {:class "card-body" :style "margin-bottom:20px"}
+      [:div {:class "card-title" :style "text-align:center"}
+       [:h3 "Utisak o proizvođaču"]
+       [:h1 (:name p)]]
+      (form/form-to
+        [:post "/producer-reviews"]
+     [:br]
+        [:div.form-group
+         (form/text-field {:class "form-control" :type "hidden"} "producer-id" (str (:_id p)))
+         [:br]]
+
+        [:div.form-group
+         (form/label "review" "Utisak")
+         (form/text-area {:class "form-control" :rows "6"} "review")
+         [:br]]
+
+        [:div.form-group
+         (form/label "rating" "Ocena")
+         (form/text-field {:class "form-control" :type "number" :min "1" :max "5"} "rating")
+         [:br]]
+
+        (anti-forgery-field)
+        [:div {:style "text-align:center"}
+         (form/submit-button {:class "btn btn-primary"} "Sačuvaj")])]]))
 
 ;Admin login page
 (defn admin-login [& [message]]

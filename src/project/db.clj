@@ -26,6 +26,7 @@
 (def packaging-collection "packaging")
 (def producers-collection "producers")
 (def products-collection "products")
+(def producer-reviews-collection "producer_reviews")
 
 ;Certified collection
 (defn get-certified []
@@ -131,5 +132,15 @@
                                              {:producer_id (str (:_id (into {} (get-producer-by-name {$regex (str ".*" keyword ".*")}))))}]
                                         }))
 
+;Producer-reviews collection
+(defn create-producer-review [producer-id review rating]
+  (mc/insert db producer-reviews-collection
+             {:producer_id producer-id
+              :review review
+              :rating rating}))
 
+(defn get-reviews-for-producer [producer-id]
+  (mc/find-maps db producer-reviews-collection {:producer_id producer-id}))
 
+(defn get-all-producer-reviews []
+  (mc/find-maps db producer-reviews-collection))
