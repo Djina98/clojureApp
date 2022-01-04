@@ -237,7 +237,8 @@
 ;Product page
 (defn product [p]
   (template
-    [:small (str "Proizvođač: " ((into {} (db/get-producer-by-id (:producer_id p))) :name))]
+    [:div {:style "text-align:center"}
+    [:a {:href (str "/producers/" (:producer_id p)) :style "color:black;font-weight:bold"} (str "Proizvođač: " ((into {} (db/get-producer-by-id (:producer_id p))) :name))]
     [:br]
     [:small (str "Vrsta meda: " (:type p))]
     [:hr]
@@ -254,7 +255,7 @@
       (anti-forgery-field)
       [:a.btn.btn-secondary {:href (str "/products") :style "margin-right:15px"} "Nazad"]
       [:a.btn.btn-primary {:href (str "/products/" (:_id p) "/edit") :style "margin-right:15px"} "Izmeni"]
-      (form/submit-button {:class "btn btn-danger"} "Obriši"))
+      (form/submit-button {:class "btn btn-danger"} "Obriši"))]
     ))
 
 ;Edit product and Add new product form
