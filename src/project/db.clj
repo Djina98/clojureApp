@@ -94,8 +94,8 @@
               :amount amount
               :price price
               :type type
-              :producer_id (str (get (into {} (get-producer-by-name producer_id)) :_id))})
-              :packaging_id (str (get (into {} (get-packaging-by-name packaging_id)) :_id)))
+              :producer_id (str (get (into {} (get-producer-by-name producer_id)) :_id))
+              :packaging_id (str (get (into {} (get-packaging-by-name packaging_id)) :_id))}))
 
 (defn update-product [product-id name description amount price type producer_id packaging_id]
   (mc/update-by-id db products-collection (ObjectId. product-id)
@@ -181,5 +181,5 @@
                                                      {:product_id (str (:_id (into {} (get-product-by-name {$regex (str ".*" keyword ".*")}))))}]}))
 
 (defn delete-producer-review [producer-review-id]
-  (mc/remove-by-id db producer-reviews-collection producer-review-id))
+  (mc/remove-by-id db producer-reviews-collection (ObjectId. producer-review-id)))
 
