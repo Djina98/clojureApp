@@ -153,7 +153,6 @@
         (form/submit-button {:class "btn btn-danger"} "Obriši")
         (form/submit-button {:class "btn btn-danger" :disabled "disabled"} "Obriši")
         )
-      
       )]
     [:hr]
     [:div {:class "row" :style "padding:15px"}
@@ -170,8 +169,11 @@
             ]]
 
           [:p {:class "card-text"} (:review r)]
-          ]]]
-       )]
+          [:div {:style "text-align:center"}
+           (form/form-to
+             [:delete (str "/producers/" (:producer_id r) "/" (:_id r))]
+             (anti-forgery-field)
+             (form/submit-button {:class "btn btn-danger"} "Obriši"))]]]])]
     ))
 
 ;Edit producer and Add new producer form

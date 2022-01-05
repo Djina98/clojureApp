@@ -78,6 +78,11 @@
              (do (db/delete-producer producer-id)
                  (response/redirect "/")))
 
+           ;Route for delete producer-review
+           (DELETE "/producers/:producer-id/:producer-review-id" [producer-id producer-review-id]
+             (do (db/delete-producer-review producer-review-id)
+                 (response/redirect (str "/producers/" producer-id))))
+
            ;Routes for new product
            (GET "/products/new" [] (pages/edit-product nil))
            (POST "/products" [name description amount price type producer_id packaging_id]
