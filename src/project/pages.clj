@@ -149,7 +149,12 @@
       (anti-forgery-field)
       [:a.btn.btn-secondary {:href (str "/") :style "margin-right:15px"} "Nazad"]
       [:a.btn.btn-primary {:href (str "/producers/" (:_id p) "/edit") :style "margin-right:15px"} "Izmeni"]
-      (form/submit-button {:class "btn btn-danger"} "Obriši"))]
+      (if (and (empty? reviews) (empty? (db/get-products-by-producer (str (:_id p)))))
+        (form/submit-button {:class "btn btn-danger"} "Obriši")
+        (form/submit-button {:class "btn btn-danger" :disabled "disabled"} "Obriši")
+        )
+      
+      )]
     [:hr]
     [:div {:class "row" :style "padding:15px"}
      [:h3 {:style "text-align:center;margin-bottom:20px"} "Utisci"]
