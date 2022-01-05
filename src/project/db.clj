@@ -152,6 +152,9 @@
 (defn get-all-producer-reviews []
   (mc/find-maps db producer-reviews-collection))
 
+(defn delete-producer-review [producer-review-id]
+  (mc/remove-by-id db producer-reviews-collection (ObjectId. producer-review-id)))
+
 ;Search producer-reviews
 (defn search-producer-reviews [keyword]
   (mc/find-maps db producer-reviews-collection {$or [{:review {$regex (str ".*" keyword ".*")}}
@@ -174,12 +177,14 @@
 (defn get-all-product-reviews []
   (mc/find-maps db product-reviews-collection))
 
+(defn delete-product-review [product-review-id]
+  (mc/remove-by-id db product-reviews-collection (ObjectId. product-review-id)))
+
 ;Search product-reviews
 (defn search-product-reviews [keyword]
   (mc/find-maps db product-reviews-collection {$or [{:review {$regex (str ".*" keyword ".*")}}
                                                      {:rating {$regex (str ".*" keyword ".*")}}
                                                      {:product_id (str (:_id (into {} (get-product-by-name {$regex (str ".*" keyword ".*")}))))}]}))
 
-(defn delete-producer-review [producer-review-id]
-  (mc/remove-by-id db producer-reviews-collection (ObjectId. producer-review-id)))
+
 

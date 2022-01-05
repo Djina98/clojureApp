@@ -98,7 +98,12 @@
            ;Route for delete product
            (DELETE "/products/:product-id" [product-id]
              (do (db/delete-product product-id)
-                 (response/redirect "/products"))))
+                 (response/redirect "/products")))
+
+           ;Route for delete product-review
+           (DELETE "/products/:product-id/:product-review-id" [product-id product-review-id]
+             (do (db/delete-product-review product-review-id)
+                 (response/redirect (str "/products/" product-id)))))
 
 (defn wrap-admin-only [handler]
   (fn [request]

@@ -293,7 +293,10 @@
       (anti-forgery-field)
       [:a.btn.btn-secondary {:href (str "/products") :style "margin-right:15px"} "Nazad"]
       [:a.btn.btn-primary {:href (str "/products/" (:_id p) "/edit") :style "margin-right:15px"} "Izmeni"]
-      (form/submit-button {:class "btn btn-danger"} "Obriši"))
+      (if (empty? reviews)
+        (form/submit-button {:class "btn btn-danger"} "Obriši")
+        (form/submit-button {:class "btn btn-danger" :disabled "disabled"} "Obriši")
+        ))
      [:hr]
 
      [:div {:class "row" :style "padding:15px"}
@@ -308,7 +311,12 @@
             [:div {:class "col text-center"}
              [:a {:style "font-weight:bold;color:black"} (str "Ocena: " (:rating r))]
              ]]
-           [:p {:class "card-text"} (:review r)]]]])]]
+           [:p {:class "card-text"} (:review r)]
+           [:div {:style "text-align:center"}
+            (form/form-to
+              [:delete (str "/products/" (:product_id r) "/" (:_id r))]
+              (anti-forgery-field)
+              (form/submit-button {:class "btn btn-danger"} "Obriši"))]]]])]]
     ))
 
 ;Edit product and Add new product form
