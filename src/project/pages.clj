@@ -33,6 +33,9 @@
      [:script "function searchInProducerReviews() {
           var keyword = document.getElementById(\"searchProducerReviews\").value;
           window.location.href = \"/producer-reviews/keyword/\" + keyword;}"]
+     [:script "function searchInProductReviews() {
+          var keyword = document.getElementById(\"searchProductReviews\").value;
+          window.location.href = \"/product-reviews/keyword/\" + keyword;}"]
      ]
     [:body
      [:nav.navbar.navbar-expand-sm.bg-success.navbar-dark
@@ -44,15 +47,17 @@
        [:div.dropdown
         [:button.dropbtn "Proizvođači\n      " [:i.fa.fa-caret-down]]
         [:div.dropdown-content
-         [:a {:href "/"} "Pregled"]
-         [:a {:href "/producers/new"} "Dodaj novog"]
+         [:a {:href "/"} "Dostupni proizvođači"]
+         [:a {:href "/producers/new"} "Dodaj novog proizvođača"]
+         [:a {:href "/producer-reviews"} "Utisci o proizvođačima"]
          ]]]
        [:li.nav-item
        [:div.dropdown
         [:button.dropbtn "Proizvodi\n      " [:i.fa.fa-caret-down]]
         [:div.dropdown-content
-         [:a {:href "/products"} "Pregled"]
-         [:a {:href "/products/new"} "Dodaj novi"]
+         [:a {:href "/products"} "Dostupni proizvodi"]
+         [:a {:href "/products/new"} "Dodaj novi proizvod"]
+         [:a {:href "/product-reviews"} "Utisci o proizvodima"]
          ]]]
       ]
        [:div.d-flex.align-items-center
@@ -156,8 +161,7 @@
          [:div {:class "card-body"}
           [:div {:class "row"}
            [:div {:class "col text-center"}
-            [:a.btn.btn-outline-success {:href (str "/producers/" (:_id p)) :style "font-weight:bold"} (:rating r)]
-            ;[:a.btn.btn-outline-success {:href (str "/products/producers/" (:_id p)) :style "font-weight:bold"} "Ponuda"]
+            [:a {:style "font-weight:bold;color:black"} (str "Ocena: " (:rating r))]
             ]]
 
           [:p {:class "card-text"} (:review r)]
@@ -251,13 +255,24 @@
     [:br]))
 
 ;Product page
-(defn product [p]
+(defn product [p reviews]
   (template
     [:div {:style "text-align:center"}
+     [:div {:class "row"}
+      [:div {:class "col"}
+       [:br]
+       [:a.btn.btn-outline-success {:href (str "/product-reviews/" (:_id p) "/new") :style "margin-right:15px;font-weight:bold"} "Ostavi utisak o ovom proizvodu"]
+       ]
+      [:div {:class "col" :style "border:1px solid black;"}
+       [:h6 {:style "margin-top:10px"} "Prosečna ocena:"]
+       [:h1 (if (not-empty (calculate-average-rating reviews)) (nth (into [] (calculate-average-rating reviews)) (dec (count (calculate-average-rating reviews)))))]
+       [:p (if (empty? (calculate-average-rating reviews)) "Ocena nije dostupna")]
+       ]
+      ]
+     [:hr]
     [:a {:href (str "/producers/" (:producer_id p)) :style "color:black;font-weight:bold"} (str "Proizvođač: " ((into {} (db/get-producer-by-id (:producer_id p))) :name))]
     [:br]
     [:small (str "Vrsta meda: " (:type p))]
-    [:hr]
     [:h1 (:name p)]
     [:small (str "Količina u gramima: " (:amount p)) ]
     [:br]
@@ -265,13 +280,28 @@
     [:br]
     [:small (str "Ambalaža: " ((into {} (db/get-packaging-by-id (:packaging_id p))) :name))]
     [:p (-> p :description markdown/md-to-html-string)]
-    [:hr]
+
     (form/form-to
       [:delete (str "/products/" (:_id p))]
       (anti-forgery-field)
       [:a.btn.btn-secondary {:href (str "/products") :style "margin-right:15px"} "Nazad"]
       [:a.btn.btn-primary {:href (str "/products/" (:_id p) "/edit") :style "margin-right:15px"} "Izmeni"]
-      (form/submit-button {:class "btn btn-danger"} "Obriši"))]
+      (form/submit-button {:class "btn btn-danger"} "Obriši"))
+     [:hr]
+
+     [:div {:class "row" :style "padding:15px"}
+      [:h3 {:style "text-align:center;margin-bottom:20px"} "Utisci"]
+      [:p {:style "text-align:center;margin-bottom:20px"} (if (empty? reviews) "Još uvek nema dostupnih utisaka")]
+
+      (for [r reviews]
+        [:div {:class "col-sm-4"}
+         [:div {:class "card" :style "margin-bottom:30px"}
+          [:div {:class "card-body"}
+           [:div {:class "row"}
+            [:div {:class "col text-center"}
+             [:a {:style "font-weight:bold;color:black"} (str "Ocena: " (:rating r))]
+             ]]
+           [:p {:class "card-text"} (:review r)]]]])]]
     ))
 
 ;Edit product and Add new product form
@@ -296,12 +326,12 @@
 
         [:div.form-group
          (form/label "amount" "Količina")
-         (form/text-field {:class "form-control"} "amount" (:amount p))
+         (form/text-field {:class "form-control" :type "number" :min "1"} "amount" (:amount p))
          [:br]]
 
         [:div.form-group
          (form/label "price" "Cena")
-         (form/text-field {:class "form-control"} "price" (:price p))
+         (form/text-field {:class "form-control" :type "number" :min "1"} "price" (:price p))
          [:br]]
 
         [:div.form-group
@@ -357,7 +387,7 @@
          [:div {:class "card-body"}
           [:div {:class "row"}
            [:div {:class "col text-center"}
-            [:a.btn.btn-outline-success {:style "font-weight:bold;margin-bottom:20px"} ((into {} (db/get-producer-by-id (:producer_id r))) :name)]]]
+            [:a.btn.btn-outline-success {:href (str "/producers/" (:producer_id r)) :style "font-weight:bold;margin-bottom:20px"} ((into {} (db/get-producer-by-id (:producer_id r))) :name)]]]
           [:p {:class "card-text" :style "text-align:center"} (str "Ocena: " (:rating r))]
           [:p {:class "card-text" :style "text-align:center"} (:review r)]
           ]]])]
@@ -376,6 +406,74 @@
      [:br]
         [:div.form-group
          (form/text-field {:class "form-control" :type "hidden"} "producer-id" (str (:_id p)))
+         [:br]]
+
+        [:div.form-group
+         (form/label "review" "Utisak")
+         (form/text-area {:class "form-control" :rows "6"} "review")
+         [:br]]
+
+        [:div.form-group
+         (form/label "rating" "Ocena")
+         (form/text-field {:class "form-control" :type "number" :min "1" :max "5"} "rating")
+         [:br]]
+
+        (anti-forgery-field)
+        [:div {:style "text-align:center"}
+         (form/submit-button {:class "btn btn-primary"} "Sačuvaj")])]]))
+
+;Page with all product-reviews - 3 reviews per row
+(defn product-reviews [reviews]
+  (template
+    [:div {:class "row" :style "padding:15px;margin-left:10px"}
+     [:div {:class "col"}
+      [:div.dropdown {:style "margin-right:20px"}
+       [:button {:class "btn btn-outline-success" :style "font-weight:bold"} "Filtriraj po oceni\n      " [:i.fa.fa-caret-down]]
+       [:div.dropdown-content
+        [:a {:href (str "/product-reviews")} "Svi utisci"]
+        [:a {:href (str "/product-reviews/rating/5")} "Ocena 5"]
+        [:a {:href (str "/product-reviews/rating/4")} "Ocena 4"]
+        [:a {:href (str "/product-reviews/rating/3")} "Ocena 3"]
+        [:a {:href (str "/product-reviews/rating/2")} "Ocena 2"]
+        [:a {:href (str "/product-reviews/rating/1")} "Ocena 1"]
+        ]]
+
+      [:div {:class "input-group rounded" :style "margin-top:20px"}
+       [:input {:type "search"
+                :id "searchProductReviews"
+                :class "form-control rounded"
+                :placeholder "Pretraži utiske"
+                :aria-label "Pretraga"
+                :aria-describedby "search-addon"}]
+       [:button {:type "button" :id "btnSearchProductReviews" :class "btn btn-success" :onClick "searchInProductReviews()"}
+        [:i {:class "fa fa-search"}]]]
+      [:br]]]
+    [:div {:class "row" :style "padding:15px"}
+     (for [r reviews]
+       [:div {:class "col-sm-4" :id "div-glass"}
+        [:div {:class "card" :style "margin-bottom:30px"}
+         [:div {:class "card-body"}
+          [:div {:class "row"}
+           [:div {:class "col text-center"}
+            [:a.btn.btn-outline-success {:href (str "/products/" (:product_id r)) :style "font-weight:bold;margin-bottom:20px"} ((into {} (db/get-product-by-id (:product_id r))) :name)]]]
+          [:p {:class "card-text" :style "text-align:center"} (str "Ocena: " (:rating r))]
+          [:p {:class "card-text" :style "text-align:center"} (:review r)]
+          ]]])]
+    [:br]))
+
+;Add producer-review form
+(defn add-product-review [p]
+  (template
+    [:div {:class "card"}
+     [:div {:class "card-body" :style "margin-bottom:20px"}
+      [:div {:class "card-title" :style "text-align:center"}
+       [:h3 "Utisak o proizvodu"]
+       [:h1 (:name p)]]
+      (form/form-to
+        [:post "/product-reviews"]
+        [:br]
+        [:div.form-group
+         (form/text-field {:class "form-control" :type "hidden"} "product-id" (str (:_id p)))
          [:br]]
 
         [:div.form-group

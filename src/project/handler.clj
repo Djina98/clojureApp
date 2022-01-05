@@ -20,17 +20,26 @@
            (GET "/producer-reviews" [] (pages/producer-reviews (db/get-all-producer-reviews)))
            (GET "/producer-reviews/keyword/:keyword" [keyword] (pages/producer-reviews (db/search-producer-reviews keyword)))
            (GET "/producer-reviews/:producer-id/new" [producer-id] (pages/add-producer-review (db/get-producer-by-id producer-id)))
-           (GET "/producer-reviews/rating/:rating" [rating] (pages/producer-reviews (db/get-reviews-by-rating rating)))
+           (GET "/producer-reviews/rating/:rating" [rating] (pages/producer-reviews (db/get-producer-reviews-by-rating rating)))
            (POST "/producer-reviews" [producer-id review rating]
              (do (db/create-producer-review producer-id review rating)
                  (response/redirect (str "/producers/" producer-id))))
+
+           ;Routes for product-reviews
+           (GET "/product-reviews" [] (pages/product-reviews (db/get-all-product-reviews)))
+           (GET "/product-reviews/keyword/:keyword" [keyword] (pages/product-reviews (db/search-product-reviews keyword)))
+           (GET "/product-reviews/:product-id/new" [product-id] (pages/add-product-review (db/get-product-by-id product-id)))
+           (GET "/product-reviews/rating/:rating" [rating] (pages/product-reviews (db/get-product-reviews-by-rating rating)))
+           (POST "/product-reviews" [product-id review rating]
+             (do (db/create-product-review product-id review rating)
+                 (response/redirect (str "/products/" product-id))))
 
            ;Routes for products
            (GET "/products" [] (pages/products (db/get-products)))
            (GET "/products/packaging/:packaging-id" [packaging-id] (pages/products (db/get-products-by-packaging packaging-id)))
            (GET "/products/producer/:producer-id" [producer-id] (pages/products (db/get-products-by-producer producer-id)))
            (GET "/products/keyword/:keyword" [keyword] (pages/products (db/search-products keyword)))
-           (GET "/products/:product-id" [product-id] (pages/product (db/get-product-by-id product-id)))
+           (GET "/products/:product-id" [product-id] (pages/product (db/get-product-by-id product-id) (db/get-reviews-for-product product-id)))
 
            ;Routes for admin login and logout
            (GET "/admin/login" [:as {session :session}]

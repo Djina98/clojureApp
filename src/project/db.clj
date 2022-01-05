@@ -27,6 +27,7 @@
 (def producers-collection "producers")
 (def products-collection "products")
 (def producer-reviews-collection "producer_reviews")
+(def product-reviews-collection "product_reviews")
 
 ;Certified collection
 (defn get-certified []
@@ -119,6 +120,9 @@
 (defn get-products-by-packaging [packaging-id]
   (mc/find-maps db products-collection  {:packaging_id packaging-id}))
 
+(defn get-product-by-name [name]
+  (mc/find-maps db products-collection  {:name name}))
+
 (defn get-products-by-producer [producer-id]
   (mc/find-maps db products-collection  {:producer_id producer-id}))
 
@@ -142,7 +146,7 @@
 (defn get-reviews-for-producer [producer-id]
   (mc/find-maps db producer-reviews-collection {:producer_id producer-id}))
 
-(defn get-reviews-by-rating [rating]
+(defn get-producer-reviews-by-rating [rating]
   (mc/find-maps db producer-reviews-collection {:rating rating}))
 
 (defn get-all-producer-reviews []
@@ -153,3 +157,29 @@
   (mc/find-maps db producer-reviews-collection {$or [{:review {$regex (str ".*" keyword ".*")}}
                                                      {:rating {$regex (str ".*" keyword ".*")}}
                                                      {:producer_id (str (:_id (into {} (get-producer-by-name {$regex (str ".*" keyword ".*")}))))}]}))
+
+;Product-reviews collection
+(defn create-product-review [product-id review rating]
+  (mc/insert db product-reviews-collection
+             {:product_id product-id
+              :review review
+              :rating rating}))
+
+(defn get-reviews-for-product [product-id]
+  (mc/find-maps db product-reviews-collection {:product_id product-id}))
+
+(defn get-product-reviews-by-rating [rating]
+  (mc/find-maps db product-reviews-collection {:rating rating}))
+
+(defn get-all-product-reviews []
+  (mc/find-maps db product-reviews-collection))
+
+;Search product-reviews
+(defn search-product-reviews [keyword]
+  (mc/find-maps db product-reviews-collection {$or [{:review {$regex (str ".*" keyword ".*")}}
+                                                     {:rating {$regex (str ".*" keyword ".*")}}
+                                                     {:product_id (str (:_id (into {} (get-product-by-name {$regex (str ".*" keyword ".*")}))))}]}))
+
+(defn delete-producer-review [producer-review-id]
+  (mc/remove-by-id db producer-reviews-collection producer-review-id))
+
