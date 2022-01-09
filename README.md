@@ -4,7 +4,7 @@ Clojure web application for purposes of exam "Alati i metode softverskog inženj
 Bee organic gives important information about producers and products made from organic honey. 
 
 Application has two roles - admin and users. 
-Admin has to be logged in application in order to change data. Functionalities for admin are:
+Admin has to be logged in application in order to change data. Credentials for admin are username: "admin" and password: "admin". Functionalities for admin are:
 - view all producers
 - add new producer
 - edit producer
@@ -42,12 +42,16 @@ Application structure and login/logout functions are used from Udemy course that
 
 ## Prerequisites
 
-You will need [MongoDB](https://www.mongodb.com/) and [Leiningen][] 2.0.0 or above installed.
+You will need [MongoDB](https://www.mongodb.com/), [MongoDB Database Tools](https://www.mongodb.com/try/download/database-tools) and [Leiningen][] 2.0.0 or above installed.
 
 [leiningen]: https://github.com/technomancy/leiningen
 
 ## Running
 
+Before starting a web server, you will need to import database from database directory. In order to do that, you need to position to the bin folder of MongoDB Database Tools in CMD and run command:
+
+    mongorestore -d project "path to database folder"
+    
 To start a web server for the application, run following command from root folder:
 
     lein ring server
