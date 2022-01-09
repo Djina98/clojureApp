@@ -15,6 +15,7 @@
 (defn template [& body]
   (html5
     [:head [:title "Bee organic"]
+            [:link {:rel "icon" :type "image/x-icon" :href "/favicon.png"}]
      [:link {:rel "stylesheet"
              :href "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"}]
      [:link {:rel "stylesheet"
